@@ -213,8 +213,8 @@ void get_refresh_rate(MainStruct& mS) {
 
 void initialize_sdl(MainStruct& mS) {
     SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_NAME_STRING, "InfiniPaint");
-    SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_VERSION_STRING, VersionConstants::CURRENT_VERSION_STRING.c_str());
-    SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_IDENTIFIER_STRING, "com.infinipaint.infinipaint");
+    SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_VERSION_STRING, VersionConstants::DISPLAY_VERSION_STRING.c_str());
+    SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_IDENTIFIER_STRING, "com.infinipaint.infinipaint-custom");
     SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_CREATOR_STRING, "Yousef Khadadeh (ErrorAtLine0)");
     SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_COPYRIGHT_STRING, "Copyright (C) 2025-2026 Yousef Khadadeh");
     SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_URL_STRING, "https://infinipaint.com/");
@@ -282,7 +282,7 @@ void initialize_sdl(MainStruct& mS) {
     }
     #endif
 
-    mS.window = SDL_CreateWindow("InfiniPaint", mS.m->window.size.x() >= 0 ? mS.m->window.size.x() : DEFAULT_WINDOW_WIDTH, mS.m->window.size.y() >= 0 ? mS.m->window.size.y() : DEFAULT_WINDOW_HEIGHT, window_flags);
+    mS.window = SDL_CreateWindow("InfiniPaint (Custom)", mS.m->window.size.x() >= 0 ? mS.m->window.size.x() : DEFAULT_WINDOW_WIDTH, mS.m->window.size.y() >= 0 ? mS.m->window.size.y() : DEFAULT_WINDOW_HEIGHT, window_flags);
     mS.m->window.sdlWindow = mS.window;
     if(mS.window == nullptr)
         throw std::runtime_error("[SDL_CreateWindow] " + std::string(SDL_GetError()));
@@ -435,7 +435,7 @@ void init_logs(MainStruct& mS) {
     std::filesystem::create_directory(CONFIG_FOLDER_NAME);
     mS.configPath = mS.homePath / CONFIG_FOLDER_NAME;
 #else
-    char* configPathSDL = SDL_GetPrefPath("ErrorAtLine0", "infinipaint");
+    char* configPathSDL = SDL_GetPrefPath("CreativeKidofGod", "infinipaint-custom");
     mS.configPath = std::filesystem::path(configPathSDL);
     SDL_free(configPathSDL);
 #endif

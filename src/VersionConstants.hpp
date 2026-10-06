@@ -31,4 +31,10 @@ namespace VersionConstants {
     const std::string CURRENT_SAVEFILE_HEADER = "INFPNT000006"; // Change whenever the save file is incompatible with the previous version
     const std::string CURRENT_VERSION_STRING = "0.6.1";
     constexpr VersionNumber CURRENT_VERSION_NUMBER(0, 6, 1);
+
+    // Custom fork build tag (CreativeKidofGod/infinipaint). Kept separate from
+    // CURRENT_VERSION_STRING, which must stay a plain "x.y.z" because config.json
+    // and the update checker parse it as a number.
+    const std::string CUSTOM_BUILD_TAG = "custom.1";
+    const std::string DISPLAY_VERSION_STRING = CURRENT_VERSION_STRING + "-" + CUSTOM_BUILD_TAG;
 }
