@@ -5,8 +5,8 @@ unchecked item in each update until Levi confirms it.
 
 ## Phase 0
 
-- [ ] Wait for the first Windows build to finish (1–2+ hours, Actions tab).
-- [ ] Download the zip from the finished run (link expires after 30 days).
+- [x] First Windows build finished (run #1, 2026-10-07).
+- [ ] Download the zip from run #1 (link expires 2026-11-06).
 - [ ] Unzip it to a folder outside OneDrive (for example `C:\InfiniPaint-Custom`).
 - [ ] Open `infinipaint.exe` and confirm it runs. Tell Claude the result.
 
