@@ -13,7 +13,8 @@ unchecked item in each update until Levi confirms it.
 
 ## Phase 1 (layers)
 
-- [ ] Wait for build #2 to finish (Actions tab), then download it.
+- [x] Phase 1 build finished (run #5, 2026-10-08).
+- [ ] Download run #5 (link expires 2026-11-07).
 - [ ] Test it (checklist in chat) and tell Claude the result.
 
 ## Standing reminders
