@@ -99,6 +99,9 @@ choices stay true to what Levi asked for.
    - Keep the PDF text available to Ctrl+F.
    - Tested 2026-10-06: an SVG board with text converted to paths imports and renders correctly in his current build.
      A PDF dropped onto the canvas shows only a file icon.
+   - Checked 2026-10-08 (Windows build): PNG, JPG, WEBP, GIF, BMP and ICO show as pictures. SVG shows, with the limits above.
+     PDF, HEIC (iPhone photos), AVIF, TIFF, JPEG XL, Word/PowerPoint and video show only a file icon.
+     Add HEIC/AVIF here too if they're easy and sell-friendly (Levi may paste phone photos).
 5. **Export a region as PDF** (SVG/PNG/JPG/WEBP export already exist; Skia has a PDF backend).
 6. **Ctrl+F search.**
    - Covers typed text, PDF text, and handwriting (Windows' built-in, offline handwriting recognition).
