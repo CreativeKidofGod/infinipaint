@@ -11,6 +11,11 @@ unchecked item in each update until Levi confirms it.
 - [x] App runs; saving and reopening a canvas works (2026-10-07).
 - [x] Window title shows "InfiniPaint (Custom)".
 
+## Phase 1 (layers)
+
+- [ ] Wait for build #2 to finish (Actions tab), then download it.
+- [ ] Test it (checklist in chat) and tell Claude the result.
+
 ## Standing reminders
 
 - The portable app keeps settings, and its default save folder, inside the app

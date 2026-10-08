@@ -7,7 +7,13 @@ name: Windows portable build
 on:
   push:
     branches: [main]
+    # Pushing a tag like v0.6.1-custom.2 also publishes a GitHub Release,
+    # whose download never expires (artifacts expire after 30 days).
+    tags: ["v*"]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 concurrency:
   group: windows-build-${{ github.ref }}
@@ -25,11 +31,11 @@ jobs:
       - name: Enable long paths for git
         run: git config --system core.longpaths true
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -52,7 +58,7 @@ jobs:
 
       - name: Restore Conan cache
         id: conan-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: C:\c2\p
           key: conan-win-x86_64-msvc${{ steps.msvc.outputs.version }}-${{ hashFiles('conanfile.py', 'conan/**', 'conan/profiles/win-x86_64') }}
@@ -76,7 +82,7 @@ jobs:
       # InfiniPaint itself never throws away hours of dependency builds.
       - name: Save Conan cache
         if: always() && steps.conan-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: C:\c2\p
           key: conan-win-x86_64-msvc${{ steps.msvc.outputs.version }}-${{ hashFiles('conanfile.py', 'conan/**', 'conan/profiles/win-x86_64') }}
@@ -132,8 +138,17 @@ jobs:
           Compress-Archive -Path "$env:GITHUB_WORKSPACE\package\InfiniPaint-Custom" -DestinationPath "$env:GITHUB_WORKSPACE\$name.zip"
           "ZIP_NAME=$name" >> $env:GITHUB_ENV
 
-      - uses: actions/upload-artifact@v4
+      # archive: false uploads the zip as-is, so the download is one zip, not a zip inside a zip
+      - uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.ZIP_NAME }}
+          name: ${{ env.ZIP_NAME }}.zip
           path: ${{ env.ZIP_NAME }}.zip
+          archive: false
           retention-days: 30
+
+      - name: Publish GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" "$env:GITHUB_WORKSPACE\$env:ZIP_NAME.zip" --repo "${{ github.repository }}" --title "${{ github.ref_name }}" --notes "Portable Windows build of InfiniPaint Custom. Unzip outside OneDrive and run infinipaint.exe." --prerelease

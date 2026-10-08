@@ -20,6 +20,7 @@
 #include "DrawingProgramLayerListItem.hpp"
 #include "DrawingProgramLayerManagerGUI.hpp"
 #include <unordered_set>
+#include <array>
 
 class DrawingProgramLayerManager {
     private:
@@ -36,7 +37,26 @@ class DrawingProgramLayerManager {
         void erase_component_map(const std::unordered_map<DrawingProgramLayerListItem*, std::vector<CanvasComponentContainer::ObjInfoIterator>>& eraseMap, bool newUndo = true);
         bool commitUpdateOnComponentInsert = true;
         bool addToCacheOnComponentInsert = true;
+        DrawingProgramLayerListItem* get_routed_layer(DrawingProgramLayerListItem* editLayer, CanvasComponentType compType);
     public:
+        // Custom fork: locked layer types. These are ordinary layers at the top
+        // level of the layer list, recognized by their exact name, so canvases
+        // stay openable in official InfiniPaint. When one of them is being
+        // edited, new objects are sent to the layer that matches their type.
+        enum class LockedLayerType {
+            NONE,
+            BASE,     // large images (boards)
+            OVERLAY,  // smaller images
+            CALENDAR,
+            WRITING   // strokes, text, lines, shapes
+        };
+        static constexpr std::array<LockedLayerType, 4> LOCKED_LAYERS_TOP_TO_BOTTOM = {LockedLayerType::WRITING, LockedLayerType::CALENDAR, LockedLayerType::OVERLAY, LockedLayerType::BASE};
+        static const char* locked_layer_name(LockedLayerType type);
+        LockedLayerType get_locked_layer_type(const DrawingProgramLayerListItem* layer) const;
+        DrawingProgramLayerListItem* find_locked_layer(LockedLayerType type) const;
+        void add_missing_locked_layers();
+        void switch_editing_layer_to(DrawingProgramLayerListItem* layer);
+
         enum class LayerSelector {
             ALL_VISIBLE_LAYERS,
             LAYER_BEING_EDITED

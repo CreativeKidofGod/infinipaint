@@ -39,6 +39,23 @@ choices stay true to what Levi asked for.
 - **WARNING:** the portable build keeps config, and the default save folder, next to the exe.
   Replacing the app folder can delete canvases saved there. Warn Levi before every update until Phase 2 fixes it.
 
+## Phase 1: locked layers (built, waiting for Levi's test)
+
+- **Four layers at the top of the list, bottom to top: Base, Overlay, Calendar, Writing.**
+  They are normal layers recognized by their exact name, so canvases still open in official InfiniPaint.
+  Why: no save-format change until Phase 2.
+- **New canvases start with these four. Old canvases get any missing ones added when opened.**
+  Old content stays where it was (e.g. "First Layer").
+- **Routing:** while one of the four is selected, strokes, text, lines and shapes go to Writing.
+  Images go to Overlay, unless Base is selected (then they stay on Base). The app switches to the layer the item went into.
+  Why: Levi picked "nothing lands in the wrong layer". "Large vs small" can't be detected reliably, so
+  images default to Overlay, and boards go to Base by selecting Base first or with "Move to layer".
+- **Layers Levi makes himself are never redirected.** Renaming one of the four turns it into a normal layer.
+- **Calendar gets nothing automatically yet** (the live calendar is item 9). Use "Move to layer".
+- **"Move to layer" buttons** appear under Stroke Color when something is selected with the rectangle or lasso select tools.
+  One undo step undoes the move.
+- Build: one zip instead of a zip in a zip, newer GitHub build tools, and tags starting with "v" publish a Release that never expires.
+
 ## Planned features (in order)
 
 1. **Layers**

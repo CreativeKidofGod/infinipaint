@@ -49,6 +49,7 @@ class DrawingProgramSelection {
         void push_selection_to_front();
         void push_selection_to_back();
         void delete_all();
+        void move_selection_to_layer(DrawingProgramLayerListItem* targetLayer);
         void selection_to_clipboard();
         CanvasComponentContainer::ObjInfo* get_front_object_colliding_with_in_editing_layer(const SkPath& cC);
         void input_key_callback_modify_selection(const InputManager::KeyCallbackArgs& key);
@@ -58,6 +59,8 @@ class DrawingProgramSelection {
         void cancel_finger_touch_callback(const FingerInput::TouchCallbackArgs& touch);
     private:
         bool commitChangeColorUpdate = false;
+        // Set by the "Move to layer" buttons, and done in update() so the selection isn't changed while the GUI is being built
+        DrawingProgramLayerManager::LockedLayerType pendingMoveToLayer = DrawingProgramLayerManager::LockedLayerType::NONE;
 
         void phone_bottom_toolbar_gui(PhoneDrawingProgramScreen& t);
         void translate_key(unsigned keyPressed, bool pressed);

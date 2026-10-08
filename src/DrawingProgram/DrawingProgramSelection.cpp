@@ -32,6 +32,7 @@
 #endif
 #include <include/effects/SkImageFilters.h>
 #include <include/core/SkPathBuilder.h>
+#include <ranges>
 
 #define ROTATION_POINT_RADIUS_MULTIPLIER 0.7f
 #define ROTATION_POINTS_DISTANCE 20.0f
@@ -74,6 +75,19 @@ void DrawingProgramSelection::selection_gui(Toolbar& t) {
                     }
                 });
                 text_label(gui, "Stroke Color");
+            });
+            text_label(gui, "Move to layer:");
+            left_to_right_line_layout(gui, [&]() {
+                for(auto type : DrawingProgramLayerManager::LOCKED_LAYERS_TOP_TO_BOTTOM | std::views::reverse) {
+                    if(!drawP.layerMan.find_locked_layer(type))
+                        continue;
+                    const char* name = DrawingProgramLayerManager::locked_layer_name(type);
+                    text_button(gui, name, name, {
+                        .onClick = [&, type] {
+                            pendingMoveToLayer = type;
+                        }
+                    });
+                }
             });
         }
     });
@@ -479,6 +493,10 @@ void DrawingProgramSelection::commit_transform_selection() {
 }
 
 void DrawingProgramSelection::update() {
+    if(pendingMoveToLayer != DrawingProgramLayerManager::LockedLayerType::NONE) {
+        move_selection_to_layer(drawP.layerMan.find_locked_layer(pendingMoveToLayer));
+        pendingMoveToLayer = DrawingProgramLayerManager::LockedLayerType::NONE;
+    }
     if(commitChangeColorUpdate) {
         for(auto& c : selectedSet) {
             if(c->obj->get_comp().get_stroke_color() != std::nullopt)
@@ -747,6 +765,53 @@ void DrawingProgramSelection::delete_all() {
         reset_all(); // Clear set before erasing, since calling erase_component_set will run a check to see if each object is selected and erase them one by one, which is slower
         drawP.layerMan.erase_component_container(selectedSetTemp);
     }
+}
+
+void DrawingProgramSelection::move_selection_to_layer(DrawingProgramLayerListItem* targetLayer) {
+    check_add_stroke_color_change_undo();
+
+    if(!targetLayer || !is_something_selected())
+        return;
+
+    commit_transform_selection();
+
+    std::vector<CanvasComponentContainer::ObjInfo*> toMove;
+    std::vector<CanvasComponentContainer::ObjInfo*> alreadyThere;
+    for(auto& c : selectedSet) {
+        if(c->obj->parentLayer == targetLayer)
+            alreadyThere.emplace_back(c);
+        else
+            toMove.emplace_back(c);
+    }
+    if(toMove.empty())
+        return;
+
+    // Copy the objects into the target layer (on top), then erase the originals, as one undo step.
+    // selectedSet is sorted bottom to top, so the moved objects keep their order.
+    std::vector<std::pair<CanvasComponentContainer::ObjInfoIterator, CanvasComponentContainer*>> newObjs;
+    for(auto& c : toMove)
+        newObjs.emplace_back(targetLayer->get_layer().components->end(), new CanvasComponentContainer(drawP.world.netObjMan, *c->obj->get_data_copy()));
+
+    reset_all(); // Clear the selection before erasing, like delete_all
+
+    std::vector<CanvasComponentContainer::ObjInfoIterator> insertedIts;
+    drawP.world.send_reliable_multi_command_to_all([&]() {
+        drawP.layerMan.disable_add_to_cache_and_commit_update_block([&]() {
+            insertedIts = drawP.layerMan.add_many_components_to_layer(targetLayer, newObjs, true);
+        });
+        drawP.layerMan.erase_component_container(toMove, false);
+    });
+
+    std::vector<CanvasComponentContainer::ObjInfo*> movedComps;
+    for(auto& it : insertedIts)
+        movedComps.emplace_back(&(*it));
+    parallel_loop_container(movedComps, [&drawP = drawP](CanvasComponentContainer::ObjInfo* comp) {
+        comp->obj->commit_update_dont_invalidate_cache(drawP);
+    });
+    std::vector<CanvasComponentContainer::ObjInfo*> newSelection = alreadyThere;
+    newSelection.insert(newSelection.end(), movedComps.begin(), movedComps.end());
+    drawP.layerMan.switch_editing_layer_to(targetLayer);
+    set_to_selection(newSelection);
 }
 
 void DrawingProgramSelection::erase_component(CanvasComponentContainer::ObjInfo* objToCheck) {

@@ -35,6 +35,6 @@ namespace VersionConstants {
     // Custom fork build tag (CreativeKidofGod/infinipaint). Kept separate from
     // CURRENT_VERSION_STRING, which must stay a plain "x.y.z" because config.json
     // and the update checker parse it as a number.
-    const std::string CUSTOM_BUILD_TAG = "custom.1";
+    const std::string CUSTOM_BUILD_TAG = "custom.2";
     const std::string DISPLAY_VERSION_STRING = CURRENT_VERSION_STRING + "-" + CUSTOM_BUILD_TAG;
 }
