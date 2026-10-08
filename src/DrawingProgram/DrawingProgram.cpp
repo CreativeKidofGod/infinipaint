@@ -785,10 +785,14 @@ void DrawingProgram::update_downloading_dropped_files() {
 }
 
 bool DrawingProgram::should_ask_layer_for_insert() {
+    // Always ask (Levi's choice), as long as there's a layer to put it in
     if(insertingPendingNow || !layerMan.is_a_layer_being_edited())
         return false;
-    // Only ask while one of the locked layers is being edited. Layers the user made themselves work as before.
-    return layerMan.get_locked_layer_type(layerMan.get_editing_layer()) != DrawingProgramLayerManager::LockedLayerType::NONE;
+    for(auto type : DrawingProgramLayerManager::LOCKED_LAYERS_TOP_TO_BOTTOM) {
+        if(layerMan.find_locked_layer(type))
+            return true;
+    }
+    return false;
 }
 
 void DrawingProgram::queue_pending_insert(PendingInsert&& insert, Vector2f screenPos) {
@@ -814,6 +818,9 @@ void DrawingProgram::insert_pending_into_layer(DrawingProgramLayerListItem* laye
     world.main.g.gui.set_to_layout();
     if(!layer)
         return; // Cancelled
+    auto allLayers = layerMan.get_flattened_layer_list();
+    if(std::find(allLayers.begin(), allLayers.end(), layer) == allLayers.end() || layer->is_folder())
+        return; // Layer was deleted while the question was open
     insertingPendingNow = true;
     layerMan.forcedInsertLayer = layer;
     for(auto& p : toInsert) {
@@ -840,6 +847,14 @@ void DrawingProgram::insert_layer_choice_popup_gui() {
             const char* name = DrawingProgramLayerManager::locked_layer_name(type);
             popup_menu_action_button(name, name, [&, type] {
                 insert_pending_into_layer(layerMan.find_locked_layer(type));
+            });
+        }
+        // Also offer the layer being edited if it's one the user made
+        DrawingProgramLayerListItem* editing = layerMan.get_editing_layer();
+        if(editing && layerMan.get_locked_layer_type(editing) == DrawingProgramLayerManager::LockedLayerType::NONE) {
+            std::string text = "Current layer (" + editing->get_name() + ")";
+            popup_menu_action_button("Insert into current layer", text.c_str(), [&, editing] {
+                insert_pending_into_layer(editing);
             });
         }
         popup_menu_action_button("Cancel insert", "Cancel", [&] {

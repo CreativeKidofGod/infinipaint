@@ -57,7 +57,7 @@ choices stay true to what Levi asked for.
 - **Levi's additions (2026-10-08):**
   - Dropping a file or pasting an image asks "Put it on which layer?" (Base / Overlay / Calendar / Writing / Cancel).
     Why: so nothing has to be moved after hours of writing on top of it.
-    Only asked while one of the four locked layers is selected.
+    Asked every time. If a layer Levi made himself is selected, it is offered too ("Current layer").
   - Moving keeps the exact position, size and order. It is not a manual copy/delete. One undo step.
     "Move to ... layer" is also in the right-click menu of a selection (Edit, Select and Pan tools).
   - With the Edit tool, one click on any image, file or text selects it, even if it's on another locked layer
