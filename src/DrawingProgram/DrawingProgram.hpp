@@ -86,6 +86,9 @@ class DrawingProgram {
         // Custom fork: ask which layer a dropped file or pasted image goes in.
         // Returns true if the paste was held back to ask first.
         bool hold_image_paste_to_ask_layer(const CustomEvents::PasteEvent& paste);
+        // Moves the selection to a layer, but first asks "Are you sure?" when lines, shapes or text
+        // would leave the Writing layer. guiPos is where the question appears.
+        void request_move_selection_to_layer(DrawingProgramLayerListItem* layer, Vector2f guiPos);
         void input_paste_callback(const CustomEvents::PasteEvent& paste);
         void input_android_text_box_input_callback(const CustomEvents::AndroidTextBoxInputEvent& textboxInput);
         void input_drop_text_callback(const InputManager::DropCallbackArgs& drop);
@@ -183,6 +186,9 @@ class DrawingProgram {
         void queue_pending_insert(PendingInsert&& insert, Vector2f screenPos);
         void insert_pending_into_layer(DrawingProgramLayerListItem* layer);
         void insert_layer_choice_popup_gui();
+        DrawingProgramLayerListItem* pendingMoveConfirmLayer = nullptr;
+        Vector2f pendingMoveConfirmPos = {0.0f, 0.0f};
+        void move_confirm_popup_gui();
 
         uint32_t nextID = 0;
 

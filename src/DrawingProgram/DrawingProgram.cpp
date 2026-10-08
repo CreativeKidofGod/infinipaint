@@ -487,6 +487,8 @@ void DrawingProgram::toolbar_gui(Toolbar& t) {
 void DrawingProgram::right_click_popup_gui(Toolbar& t) {
     if(!pendingInserts.empty())
         insert_layer_choice_popup_gui();
+    else if(pendingMoveConfirmLayer)
+        move_confirm_popup_gui();
     else if(rightClickPopupLocation.has_value())
         drawTool->right_click_popup_gui(t, rightClickPopupLocation.value());
 }
@@ -573,8 +575,8 @@ void DrawingProgram::selection_action_menu(Vector2f popupPos) {
                     case DrawingProgramLayerManager::LockedLayerType::WRITING: id = "Move To Writing Layer"; break;
                     case DrawingProgramLayerManager::LockedLayerType::NONE: break;
                 }
-                popup_menu_action_button(id, id, [&, type] {
-                    selection.move_selection_to_layer(layerMan.find_locked_layer(type));
+                popup_menu_action_button(id, id, [&, type, popupPos] {
+                    request_move_selection_to_layer(layerMan.find_locked_layer(type), popupPos);
                 });
             }
         }
@@ -838,6 +840,51 @@ void DrawingProgram::insert_pending_into_layer(DrawingProgramLayerListItem* laye
     }
     layerMan.forcedInsertLayer = nullptr;
     insertingPendingNow = false;
+}
+
+void DrawingProgram::request_move_selection_to_layer(DrawingProgramLayerListItem* layer, Vector2f guiPos) {
+    if(!layer || !selection.is_something_selected())
+        return;
+    bool movingWriting = false;
+    if(layerMan.get_locked_layer_type(layer) != DrawingProgramLayerManager::LockedLayerType::WRITING) {
+        for(auto* c : selection.get_selection_as_set()) {
+            if(c->obj->get_comp().get_type() != CanvasComponentType::IMAGE && c->obj->parentLayer != layer) {
+                movingWriting = true;
+                break;
+            }
+        }
+    }
+    if(movingWriting) {
+        pendingMoveConfirmLayer = layer;
+        pendingMoveConfirmPos = guiPos;
+        world.main.g.gui.set_to_layout();
+    }
+    else
+        selection.move_selection_to_layer(layer);
+}
+
+void DrawingProgram::move_confirm_popup_gui() {
+    using namespace GUIStuff;
+    using namespace ElementHelpers;
+
+    GUIStuff::GUIManager& gui = world.main.g.gui;
+
+    right_click_action_menu(pendingMoveConfirmPos, [&] {
+        text_label_light(gui, "Lines, shapes and text usually stay on Writing.");
+        text_label_light(gui, std::string("Move them to ") + pendingMoveConfirmLayer->get_name() + "? Are you sure?");
+        popup_menu_action_button("Confirm move to layer", "Yes, Move", [&] {
+            DrawingProgramLayerListItem* layer = pendingMoveConfirmLayer;
+            pendingMoveConfirmLayer = nullptr;
+            world.main.g.gui.set_to_layout();
+            auto allLayers = layerMan.get_flattened_layer_list();
+            if(std::find(allLayers.begin(), allLayers.end(), layer) != allLayers.end())
+                selection.move_selection_to_layer(layer);
+        });
+        popup_menu_action_button("Cancel move to layer", "Cancel", [&] {
+            pendingMoveConfirmLayer = nullptr;
+            world.main.g.gui.set_to_layout();
+        });
+    });
 }
 
 void DrawingProgram::insert_layer_choice_popup_gui() {

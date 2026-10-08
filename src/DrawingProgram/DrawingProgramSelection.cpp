@@ -494,7 +494,7 @@ void DrawingProgramSelection::commit_transform_selection() {
 
 void DrawingProgramSelection::update() {
     if(pendingMoveToLayer != DrawingProgramLayerManager::LockedLayerType::NONE) {
-        move_selection_to_layer(drawP.layerMan.find_locked_layer(pendingMoveToLayer));
+        drawP.request_move_selection_to_layer(drawP.layerMan.find_locked_layer(pendingMoveToLayer), drawP.world.main.input.mouse.pos / drawP.world.main.g.final_gui_scale());
         pendingMoveToLayer = DrawingProgramLayerManager::LockedLayerType::NONE;
     }
     if(commitChangeColorUpdate) {

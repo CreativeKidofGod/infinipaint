@@ -15,7 +15,8 @@ unchecked item in each update until Levi confirms it.
 
 - [x] Phase 1 build finished (run #5, 2026-10-08).
 - [x] Downloaded and tested run #5: all worked except right-click Move To buttons.
-- [ ] Download the fixed build and check the right-click Move To buttons work.
+- [x] Build -6: right-click Move To buttons work (2026-10-08).
+- [ ] Test the "Are you sure?" check when moving lines/shapes off Writing.
 
 ## Standing reminders
 
