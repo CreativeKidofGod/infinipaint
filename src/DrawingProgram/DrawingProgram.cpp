@@ -564,9 +564,16 @@ void DrawingProgram::selection_action_menu(Vector2f popupPos) {
             for(auto type : DrawingProgramLayerManager::LOCKED_LAYERS_TOP_TO_BOTTOM | std::views::reverse) {
                 if(!layerMan.find_locked_layer(type))
                     continue;
-                const char* name = DrawingProgramLayerManager::locked_layer_name(type);
-                std::string id = std::string("Move To ") + name + " Layer";
-                popup_menu_action_button(id.c_str(), id.c_str(), [&, type] {
+                // GUI IDs are matched by pointer, so the text must be a string literal (not a temporary std::string)
+                const char* id = "";
+                switch(type) {
+                    case DrawingProgramLayerManager::LockedLayerType::BASE: id = "Move To Base Layer"; break;
+                    case DrawingProgramLayerManager::LockedLayerType::OVERLAY: id = "Move To Overlay Layer"; break;
+                    case DrawingProgramLayerManager::LockedLayerType::CALENDAR: id = "Move To Calendar Layer"; break;
+                    case DrawingProgramLayerManager::LockedLayerType::WRITING: id = "Move To Writing Layer"; break;
+                    case DrawingProgramLayerManager::LockedLayerType::NONE: break;
+                }
+                popup_menu_action_button(id, id, [&, type] {
                     selection.move_selection_to_layer(layerMan.find_locked_layer(type));
                 });
             }

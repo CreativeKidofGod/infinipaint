@@ -14,8 +14,8 @@ unchecked item in each update until Levi confirms it.
 ## Phase 1 (layers)
 
 - [x] Phase 1 build finished (run #5, 2026-10-08).
-- [ ] Download run #5 (link expires 2026-11-07).
-- [ ] Test it (checklist in chat) and tell Claude the result.
+- [x] Downloaded and tested run #5: all worked except right-click Move To buttons.
+- [ ] Download the fixed build and check the right-click Move To buttons work.
 
 ## Standing reminders
 
