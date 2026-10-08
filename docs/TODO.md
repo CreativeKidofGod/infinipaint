@@ -9,7 +9,7 @@ unchecked item in each update until Levi confirms it.
 - [x] Downloaded the zip from run #1.
 - [x] Unzipped to Downloads\InfiniPaint-Custom (not OneDrive).
 - [x] App runs; saving and reopening a canvas works (2026-10-07).
-- [ ] Confirm the window title says "InfiniPaint (Custom)".
+- [x] Window title shows "InfiniPaint (Custom)".
 
 ## Standing reminders
 
