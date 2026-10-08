@@ -82,6 +82,10 @@ class DrawingProgram {
 
         void on_tab_out();
         void input_add_file_to_canvas_callback(const CustomEvents::AddFileToCanvasEvent& addFile);
+
+        // Custom fork: ask which layer a dropped file or pasted image goes in.
+        // Returns true if the paste was held back to ask first.
+        bool hold_image_paste_to_ask_layer(const CustomEvents::PasteEvent& paste);
         void input_paste_callback(const CustomEvents::PasteEvent& paste);
         void input_android_text_box_input_callback(const CustomEvents::AndroidTextBoxInputEvent& textboxInput);
         void input_drop_text_callback(const InputManager::DropCallbackArgs& drop);
@@ -166,6 +170,19 @@ class DrawingProgram {
         std::vector<DroppedDownloadingFile> droppedDownloadingFiles;
 
         std::optional<Vector2f> rightClickPopupLocation;
+
+        struct PendingInsert {
+            bool isPaste = false;
+            CustomEvents::AddFileToCanvasEvent file;
+            CustomEvents::PasteEvent paste;
+        };
+        std::vector<PendingInsert> pendingInserts;
+        Vector2f pendingInsertPopupPos = {0.0f, 0.0f};
+        bool insertingPendingNow = false;
+        bool should_ask_layer_for_insert();
+        void queue_pending_insert(PendingInsert&& insert, Vector2f screenPos);
+        void insert_pending_into_layer(DrawingProgramLayerListItem* layer);
+        void insert_layer_choice_popup_gui();
 
         uint32_t nextID = 0;
 

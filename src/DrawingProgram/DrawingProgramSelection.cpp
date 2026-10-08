@@ -896,6 +896,9 @@ void DrawingProgramSelection::paste_clipboard(Vector2f pasteScreenPos) {
 void DrawingProgramSelection::paste_image_process_event(const CustomEvents::PasteEvent& paste) {
     check_add_stroke_color_change_undo();
 
+    if(drawP.hold_image_paste_to_ask_layer(paste))
+        return;
+
     if(drawP.layerMan.is_a_layer_being_edited()) {
         if(!drawP.is_selection_allowing_tool(drawP.drawTool->get_type()))
             drawP.switch_to_tool(DrawingProgramToolType::EDIT);

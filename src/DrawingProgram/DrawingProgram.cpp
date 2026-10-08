@@ -17,6 +17,7 @@
  */
 
 #include "DrawingProgram.hpp"
+#include <ranges>
 #include "Helpers/Networking/NetLibrary.hpp"
 #include "Tools/DrawingProgramToolBase.hpp"
 #include <include/core/SkPaint.h>
@@ -484,7 +485,9 @@ void DrawingProgram::toolbar_gui(Toolbar& t) {
 }
 
 void DrawingProgram::right_click_popup_gui(Toolbar& t) {
-    if(rightClickPopupLocation.has_value())
+    if(!pendingInserts.empty())
+        insert_layer_choice_popup_gui();
+    else if(rightClickPopupLocation.has_value())
         drawTool->right_click_popup_gui(t, rightClickPopupLocation.value());
 }
 
@@ -558,6 +561,15 @@ void DrawingProgram::selection_action_menu(Vector2f popupPos) {
             popup_menu_action_button("Send to back of layer", "Send to back of layer", [&] {
                 selection.push_selection_to_back();
             });
+            for(auto type : DrawingProgramLayerManager::LOCKED_LAYERS_TOP_TO_BOTTOM | std::views::reverse) {
+                if(!layerMan.find_locked_layer(type))
+                    continue;
+                const char* name = DrawingProgramLayerManager::locked_layer_name(type);
+                std::string id = std::string("Move to ") + name + " layer";
+                popup_menu_action_button(id.c_str(), id.c_str(), [&, type] {
+                    selection.move_selection_to_layer(layerMan.find_locked_layer(type));
+                });
+            }
         }
     });
 }
@@ -772,7 +784,77 @@ void DrawingProgram::update_downloading_dropped_files() {
     }
 }
 
+bool DrawingProgram::should_ask_layer_for_insert() {
+    if(insertingPendingNow || !layerMan.is_a_layer_being_edited())
+        return false;
+    // Only ask while one of the locked layers is being edited. Layers the user made themselves work as before.
+    return layerMan.get_locked_layer_type(layerMan.get_editing_layer()) != DrawingProgramLayerManager::LockedLayerType::NONE;
+}
+
+void DrawingProgram::queue_pending_insert(PendingInsert&& insert, Vector2f screenPos) {
+    if(pendingInserts.empty())
+        pendingInsertPopupPos = screenPos / world.main.g.final_gui_scale();
+    pendingInserts.emplace_back(std::move(insert));
+    world.main.g.gui.set_to_layout();
+}
+
+bool DrawingProgram::hold_image_paste_to_ask_layer(const CustomEvents::PasteEvent& paste) {
+    if(!should_ask_layer_for_insert())
+        return false;
+    PendingInsert p;
+    p.isPaste = true;
+    p.paste = paste;
+    queue_pending_insert(std::move(p), paste.mousePos.value_or(world.main.input.mouse.pos));
+    return true;
+}
+
+void DrawingProgram::insert_pending_into_layer(DrawingProgramLayerListItem* layer) {
+    std::vector<PendingInsert> toInsert = std::move(pendingInserts);
+    pendingInserts.clear();
+    world.main.g.gui.set_to_layout();
+    if(!layer)
+        return; // Cancelled
+    insertingPendingNow = true;
+    layerMan.forcedInsertLayer = layer;
+    for(auto& p : toInsert) {
+        if(p.isPaste)
+            selection.paste_image_process_event(p.paste);
+        else
+            input_add_file_to_canvas_callback(p.file);
+    }
+    layerMan.forcedInsertLayer = nullptr;
+    insertingPendingNow = false;
+}
+
+void DrawingProgram::insert_layer_choice_popup_gui() {
+    using namespace GUIStuff;
+    using namespace ElementHelpers;
+
+    GUIStuff::GUIManager& gui = world.main.g.gui;
+
+    right_click_action_menu(pendingInsertPopupPos, [&] {
+        text_label_light(gui, pendingInserts.size() == 1 ? "Put it on which layer?" : "Put these on which layer?");
+        for(auto type : DrawingProgramLayerManager::LOCKED_LAYERS_TOP_TO_BOTTOM | std::views::reverse) {
+            if(!layerMan.find_locked_layer(type))
+                continue;
+            const char* name = DrawingProgramLayerManager::locked_layer_name(type);
+            popup_menu_action_button(name, name, [&, type] {
+                insert_pending_into_layer(layerMan.find_locked_layer(type));
+            });
+        }
+        popup_menu_action_button("Cancel insert", "Cancel", [&] {
+            insert_pending_into_layer(nullptr);
+        });
+    });
+}
+
 void DrawingProgram::input_add_file_to_canvas_callback(const CustomEvents::AddFileToCanvasEvent& addFile) {
+    if(should_ask_layer_for_insert()) {
+        PendingInsert p;
+        p.file = addFile;
+        queue_pending_insert(std::move(p), addFile.pos);
+        return;
+    }
     if(addFile.type == CustomEvents::AddFileToCanvasEvent::Type::PATH)
         add_file_to_canvas_by_path(addFile.filePath, addFile.pos);
     else

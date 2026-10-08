@@ -23,6 +23,7 @@
 #include "EditTools/DrawingProgramEditToolBase.hpp"
 
 class DrawingProgram;
+class SkPath;
 
 class EditTool : public DrawingProgramToolBase {
     public:
@@ -62,6 +63,7 @@ class EditTool : public DrawingProgramToolBase {
         void add_point_handle(const HandleData& handle);
         void edit_start(CanvasComponentContainer::ObjInfo* comp, const Vector2f& pointerPos, bool initUndoAfterEditDone = true);
         bool is_editable(CanvasComponentContainer::ObjInfo* comp);
+        void switch_to_locked_layer_under_click(const SkPath& cC);
 
         std::unique_ptr<DrawingProgramEditToolBase> compEditTool;
         std::vector<HandleData> pointHandles;

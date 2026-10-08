@@ -56,6 +56,9 @@ class DrawingProgramLayerManager {
         DrawingProgramLayerListItem* find_locked_layer(LockedLayerType type) const;
         void add_missing_locked_layers();
         void switch_editing_layer_to(DrawingProgramLayerListItem* layer);
+        DrawingProgramLayerListItem* get_editing_layer();
+        // When set, new objects go into this layer instead of being routed (used after asking the user)
+        DrawingProgramLayerListItem* forcedInsertLayer = nullptr;
 
         enum class LayerSelector {
             ALL_VISIBLE_LAYERS,

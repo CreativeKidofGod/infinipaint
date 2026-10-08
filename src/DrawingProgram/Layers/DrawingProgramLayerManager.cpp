@@ -128,6 +128,10 @@ void DrawingProgramLayerManager::switch_editing_layer_to(DrawingProgramLayerList
     }
 }
 
+DrawingProgramLayerListItem* DrawingProgramLayerManager::get_editing_layer() {
+    return editingLayer.lock().get();
+}
+
 DrawingProgramLayerListItem* DrawingProgramLayerManager::get_routed_layer(DrawingProgramLayerListItem* editLayer, CanvasComponentType compType) {
     LockedLayerType editType = get_locked_layer_type(editLayer);
     if(editType == LockedLayerType::NONE)
@@ -406,7 +410,7 @@ CanvasComponentContainer::ObjInfo* DrawingProgramLayerManager::add_component_to_
     auto editLayerPtr = editingLayer.lock();
     if(!editLayerPtr)
         throw std::runtime_error("[DrawingProgramLayerManager::add_component_to_layer_being_edited] No layer selected!");
-    DrawingProgramLayerListItem* target = get_routed_layer(editLayerPtr.get(), newObj->get_comp().get_type());
+    DrawingProgramLayerListItem* target = forcedInsertLayer ? forcedInsertLayer : get_routed_layer(editLayerPtr.get(), newObj->get_comp().get_type());
     switch_editing_layer_to(target);
     return &(*target->get_layer().components->push_back_and_send_create(target->get_layer().components, newObj));
 }

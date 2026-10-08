@@ -54,6 +54,15 @@ choices stay true to what Levi asked for.
 - **Calendar gets nothing automatically yet** (the live calendar is item 9). Use "Move to layer".
 - **"Move to layer" buttons** appear under Stroke Color when something is selected with the rectangle or lasso select tools.
   One undo step undoes the move.
+- **Levi's additions (2026-10-08):**
+  - Dropping a file or pasting an image asks "Put it on which layer?" (Base / Overlay / Calendar / Writing / Cancel).
+    Why: so nothing has to be moved after hours of writing on top of it.
+    Only asked while one of the four locked layers is selected.
+  - Moving keeps the exact position, size and order. It is not a manual copy/delete. One undo step.
+    "Move to ... layer" is also in the right-click menu of a selection (Edit, Select and Pan tools).
+  - With the Edit tool, one click on any image, file or text selects it, even if it's on another locked layer
+    (the app switches to that layer). It checks the current layer first, then Writing, Calendar, Overlay, Base.
+  - Pasting an image already exists in InfiniPaint: Ctrl+Shift+V, or right-click > Paste Image.
 - Build: one zip instead of a zip in a zip, newer GitHub build tools, and tags starting with "v" publish a Release that never expires.
 
 ## Planned features (in order)
