@@ -6,13 +6,18 @@ unchecked item in each update until Levi confirms it.
 ## Phase 0
 
 - [x] First Windows build finished (run #1, 2026-10-07).
-- [ ] Download the zip from run #1 (link expires 2026-11-06).
-- [ ] Unzip it to a folder outside OneDrive (for example `C:\InfiniPaint-Custom`).
-- [ ] Open `infinipaint.exe` and confirm it runs. Tell Claude the result.
+- [x] Downloaded the zip from run #1.
+- [x] Unzipped to Downloads\InfiniPaint-Custom (not OneDrive).
+- [x] App runs; saving and reopening a canvas works (2026-10-07).
+- [ ] Confirm the window title says "InfiniPaint (Custom)".
 
 ## Standing reminders
 
 - The portable app keeps settings, and its default save folder, inside the app
   folder. Don't save canvases there, and don't delete or replace that folder
   without moving canvases out first. (Phase 2 fixes this.)
-- Keep canvases outside OneDrive.
+- Keep canvases outside OneDrive. Documents and Desktop on this PC sync to
+  OneDrive, so don't save canvases there.
+- The official InfiniPaint is also installed. Double-clicking a canvas opens
+  the official app, not the custom one. Open canvases from inside the custom
+  app. (Phase 2 should handle this.)
