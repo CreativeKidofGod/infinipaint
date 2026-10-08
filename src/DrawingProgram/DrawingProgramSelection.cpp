@@ -77,17 +77,8 @@ void DrawingProgramSelection::selection_gui(Toolbar& t) {
                 text_label(gui, "Stroke Color");
             });
             text_label(gui, "Move To Layer:");
-            left_to_right_line_layout(gui, [&]() {
-                for(auto type : DrawingProgramLayerManager::LOCKED_LAYERS_TOP_TO_BOTTOM | std::views::reverse) {
-                    if(!drawP.layerMan.find_locked_layer(type))
-                        continue;
-                    const char* name = DrawingProgramLayerManager::locked_layer_name(type);
-                    text_button(gui, name, name, {
-                        .onClick = [&, type] {
-                            pendingMoveToLayer = type;
-                        }
-                    });
-                }
+            drawP.layer_choice_buttons([&](DrawingProgramLayerListItem* layer) {
+                pendingMoveToLayer = layer;
             });
         }
     });
@@ -493,9 +484,10 @@ void DrawingProgramSelection::commit_transform_selection() {
 }
 
 void DrawingProgramSelection::update() {
-    if(pendingMoveToLayer != DrawingProgramLayerManager::LockedLayerType::NONE) {
-        drawP.request_move_selection_to_layer(drawP.layerMan.find_locked_layer(pendingMoveToLayer), drawP.world.main.input.mouse.pos / drawP.world.main.g.final_gui_scale());
-        pendingMoveToLayer = DrawingProgramLayerManager::LockedLayerType::NONE;
+    if(pendingMoveToLayer) {
+        if(drawP.layerMan.layer_exists(pendingMoveToLayer))
+            drawP.request_move_selection_to_layer(pendingMoveToLayer, drawP.world.main.input.mouse.pos / drawP.world.main.g.final_gui_scale());
+        pendingMoveToLayer = nullptr;
     }
     if(commitChangeColorUpdate) {
         for(auto& c : selectedSet) {

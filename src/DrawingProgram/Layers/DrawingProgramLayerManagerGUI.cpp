@@ -46,6 +46,23 @@ void DrawingProgramLayerManagerGUI::refresh_gui_data() {
     editingLayerOldMetainfo = std::nullopt;
     alphaValToEdit = 0.0f;
     blendModeValToEdit = 0;
+    kindValToEdit = 0;
+}
+
+static const std::vector<std::string>& layer_kind_name_list() {
+    static const std::vector<std::string> names = {"Any", "Pictures", "Writing"}; // Same order as LayerKind
+    return names;
+}
+
+static void layer_kind_help_gui(GUIStuff::GUIManager& gui) {
+    using namespace GUIStuff::ElementHelpers;
+    text_label_light(gui, "Layer kinds");
+    text_label(gui, "Any: holds anything. Never asks.");
+    text_label(gui, "Pictures: for images and PDFs.");
+    text_label(gui, "Writing: for lines, shapes and text.");
+    text_label(gui, "Putting something on a layer meant for something else asks \"Are you sure?\" first.");
+    text_label(gui, "Drawing while a Pictures layer is selected puts it on the top Writing layer. Adding a picture while a Writing layer is selected puts it on the top Pictures layer.");
+    text_label(gui, "New layers start as Any. Renaming keeps the kind. Deleting a layer removes its rules.");
 }
 
 NetworkingObjects::NetObjTemporaryPtr<DrawingProgramLayerListItem> DrawingProgramLayerManagerGUI::get_layer_parent_from_obj_index(const GUIStuff::TreeListingObjIndexList& objIndex) {
@@ -122,7 +139,10 @@ void DrawingProgramLayerManagerGUI::setup_list_gui() {
                             .childAlignment = {.x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_CENTER}
                         },
                     }) {
-                        ellipse_wide_paragraph_label(gui, "layer name", layer->get_name());
+                        if(!layer->is_folder() && layer->get_kind() != LayerKind::ANY)
+                            ellipse_wide_paragraph_label(gui, "layer name", layer->get_name() + " [" + DrawingProgramLayerManager::layer_kind_name(layer->get_kind()) + "]");
+                        else
+                            ellipse_wide_paragraph_label(gui, "layer name", layer->get_name());
                     }
                     if(!layer->is_folder()) {
                         gui.set_z_index_keep_clipping_region(gui.get_z_index() + 1, [&] {
@@ -168,17 +188,20 @@ void DrawingProgramLayerManagerGUI::setup_list_gui() {
                             alphaValToEdit = tempPtr->get_alpha();
                             auto it = std::find(get_blend_mode_useful_list().begin(), get_blend_mode_useful_list().end(), tempPtr->get_blend_mode());
                             blendModeValToEdit = (it == get_blend_mode_useful_list().end()) ? 0 : (it - get_blend_mode_useful_list().begin());
+                            kindValToEdit = static_cast<size_t>(tempPtr->get_kind());
                         }
                         else {
                             nameToEdit.clear();
                             alphaValToEdit = 0.0f;
                             blendModeValToEdit = 0;
+                            kindValToEdit = 0;
                         }
                     }
                     else {
                         nameToEdit.clear();
                         alphaValToEdit = 0.0f;
                         blendModeValToEdit = 0;
+                        kindValToEdit = 0;
                     }
                 },
                 .moveObj = [&](const std::vector<TreeListingObjIndexList>& objectIndicesTreeListing, const TreeListingObjIndexList& newObjIndexTreeListing) {
@@ -440,6 +463,45 @@ void DrawingProgramLayerManagerGUI::setup_list_gui() {
                             editingLayerLock->set_blend_mode(layerMan, get_blend_mode_useful_list()[blendModeValToEdit]);
                     }
                 });
+            });
+            if(!editingLayerLock->is_folder()) {
+                kindValToEdit = static_cast<size_t>(editingLayerLock->get_kind()); // Stays right after Undo
+                left_to_right_line_layout(gui, [&]() {
+                    text_label(gui, "Kind");
+                    gui.element<DropDown<size_t>>("input layer kind", &kindValToEdit, layer_kind_name_list(), DropdownOptions{
+                        .onClick = [&] {
+                            auto editingLayerLock = editingLayer.lock();
+                            if(editingLayerLock && kindValToEdit <= static_cast<size_t>(LayerKind::WRITING))
+                                editingLayerLock->set_kind(layerMan, static_cast<LayerKind>(kindValToEdit));
+                        }
+                    });
+                    text_button(gui, "layer kind help", "?", {
+                        .onClick = [&] {
+                            showKindHelp = !showKindHelp;
+                            layerMan.drawP.world.main.g.gui.set_to_layout();
+                        }
+                    });
+                });
+            }
+        }
+        if(showKindHelp)
+            layer_kind_help_gui(gui);
+        else if(!editingLayerLock) {
+            text_button(gui, "layer kind help no selection", "What Are Layer Kinds?", {
+                .wide = true,
+                .onClick = [&] {
+                    showKindHelp = true;
+                    layerMan.drawP.world.main.g.gui.set_to_layout();
+                }
+            });
+        }
+        if(showKindHelp) {
+            text_button(gui, "layer kind help close", "Close Help", {
+                .wide = true,
+                .onClick = [&] {
+                    showKindHelp = false;
+                    layerMan.drawP.world.main.g.gui.set_to_layout();
+                }
             });
         }
     }

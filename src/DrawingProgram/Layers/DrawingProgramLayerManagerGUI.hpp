@@ -45,6 +45,8 @@ class DrawingProgramLayerManagerGUI {
         std::string nameForNew;
         float alphaValToEdit = 0.0f;
         size_t blendModeValToEdit = 0;
+        size_t kindValToEdit = 0;
+        bool showKindHelp = false;
 
         std::set<GUIStuff::TreeListingObjIndexList> selectedLayerIndices;
         NetworkingObjects::NetObjWeakPtr<DrawingProgramLayerListItem> editingLayer;

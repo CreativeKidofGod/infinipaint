@@ -20,7 +20,6 @@
 #include "DrawingProgramLayerListItem.hpp"
 #include "DrawingProgramLayerManagerGUI.hpp"
 #include <unordered_set>
-#include <array>
 
 class DrawingProgramLayerManager {
     private:
@@ -38,23 +37,15 @@ class DrawingProgramLayerManager {
         bool commitUpdateOnComponentInsert = true;
         bool addToCacheOnComponentInsert = true;
         DrawingProgramLayerListItem* get_routed_layer(DrawingProgramLayerListItem* editLayer, CanvasComponentType compType);
+        void add_default_layers();
+        void give_old_canvas_layer_kinds();
     public:
-        // Custom fork: locked layer types. These are ordinary layers at the top
-        // level of the layer list, recognized by their exact name, so canvases
-        // stay openable in official InfiniPaint. When one of them is being
-        // edited, new objects are sent to the layer that matches their type.
-        enum class LockedLayerType {
-            NONE,
-            BASE,     // large images (boards)
-            OVERLAY,  // smaller images
-            CALENDAR,
-            WRITING   // strokes, text, lines, shapes
-        };
-        static constexpr std::array<LockedLayerType, 4> LOCKED_LAYERS_TOP_TO_BOTTOM = {LockedLayerType::WRITING, LockedLayerType::CALENDAR, LockedLayerType::OVERLAY, LockedLayerType::BASE};
-        static const char* locked_layer_name(LockedLayerType type);
-        LockedLayerType get_locked_layer_type(const DrawingProgramLayerListItem* layer) const;
-        DrawingProgramLayerListItem* find_locked_layer(LockedLayerType type) const;
-        void add_missing_locked_layers();
+        // Custom fork: layer kinds (Any / Pictures / Writing), stored on each layer.
+        // New objects that don't match the kind of the layer being edited go to the top layer of the right kind.
+        static LayerKind kind_for_component(CanvasComponentType type);
+        static const char* layer_kind_name(LayerKind kind);
+        DrawingProgramLayerListItem* find_top_layer_of_kind(LayerKind kind);
+        bool layer_exists(DrawingProgramLayerListItem* layer);
         void switch_editing_layer_to(DrawingProgramLayerListItem* layer);
         DrawingProgramLayerListItem* get_editing_layer();
         // When set, new objects go into this layer instead of being routed (used after asking the user)

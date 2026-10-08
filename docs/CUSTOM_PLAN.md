@@ -78,6 +78,26 @@ choices stay true to what Levi asked for.
 - "Are you sure?" and Move To only cover the four locked layers. Layers Levi makes have no Move To button yet.
 - Build: one zip instead of a zip in a zip, newer GitHub build tools, and tags starting with "v" publish a Release that never expires.
 
+## Phase 1b: layer kinds (replaces the "core four" rules, Levi approved 2026-10-08)
+
+- **Every layer has a kind: Any, Pictures or Writing.** Stored on the layer, so renaming keeps it.
+  Why: simpler and uniform. No special layers, no on/off switch. Setting layers to Any = opting out.
+- **Two rules for every layer:**
+  1. Putting something on a layer of the wrong kind (pictures on Writing, lines/shapes/text on Pictures) asks
+     "Are you sure?" first, when inserting or moving. Any layers never ask.
+  2. Drawing while a Pictures layer is selected lands on the top Writing layer; adding a picture while a Writing
+     layer is selected lands on the top Pictures layer. If no layer of that kind exists, it stays where you are.
+- New canvases: Writing [Writing], Calendar [Any], Overlay [Pictures], Base [Pictures]. New layers start as Any.
+- Deleting a layer removes its rules. Nothing is re-added behind the user's back.
+- The insert question and Move To list every layer (top to bottom, with kind tag and "(Current)").
+- Layer list shows a kind tag after the name, e.g. "Notes [Writing]". Kind is set under Edit Layer > Kind.
+  A "?" button / "What Are Layer Kinds?" shows a short explanation.
+- Edit tool: one click on anything selects it, even on another visible layer (the app switches to that layer).
+- **Save format:** custom canvases now use header INFPNTCUS001 and store each layer's kind.
+  Official InfiniPaint can't open them (it says the file is invalid). Old canvases still open; layers named
+  Base/Overlay become Pictures and Writing becomes Writing. Canvases with none of those get the four defaults.
+- Calendar becomes its own kind in Phase 9 (live calendar).
+
 ## Planned features (in order)
 
 1. **Layers**

@@ -102,23 +102,19 @@ void EditTool::input_key_callback(const InputManager::KeyCallbackArgs& key) {
     drawP.selection.input_key_callback_modify_selection(key);
 }
 
-// Custom fork: if nothing in the layer being edited was clicked, and it's a locked layer,
-// look in the other visible locked layers (top to bottom) and edit that layer instead,
-// so clicking any image or text selects it without switching layers by hand.
-void EditTool::switch_to_locked_layer_under_click(const SkPath& cC) {
+// Custom fork: if nothing in the layer being edited was clicked, look in the other visible layers
+// (top to bottom) and edit that layer instead, so one click selects any picture, file or text.
+void EditTool::switch_to_layer_under_click(const SkPath& cC) {
     auto& layerMan = drawP.layerMan;
     auto somethingClickedInEditingLayer = [&] {
         // Selected objects aren't in the cache, so check both
         return drawP.selection.get_front_object_colliding_with_in_editing_layer(cC) || drawP.drawCache.get_front_object_colliding_with_in_editing_layer(cC);
     };
     DrawingProgramLayerListItem* original = layerMan.get_editing_layer();
-    if(layerMan.get_locked_layer_type(original) == DrawingProgramLayerManager::LockedLayerType::NONE)
+    if(!original || somethingClickedInEditingLayer())
         return;
-    if(somethingClickedInEditingLayer())
-        return;
-    for(auto type : DrawingProgramLayerManager::LOCKED_LAYERS_TOP_TO_BOTTOM) {
-        DrawingProgramLayerListItem* layer = layerMan.find_locked_layer(type);
-        if(!layer || layer == original || !layer->get_visible())
+    for(DrawingProgramLayerListItem* layer : layerMan.get_flattened_layer_list()) {
+        if(layer == original || !layer->get_visible())
             continue;
         layerMan.switch_editing_layer_to(layer);
         if(somethingClickedInEditingLayer())
@@ -138,7 +134,7 @@ void EditTool::input_mouse_button_on_canvas_callback(const InputManager::MouseBu
 
                 bool modifySelection = !drawP.selection.is_being_transformed();
                 if(modifySelection && !drawP.world.main.input.key(InputManager::KEY_GENERIC_LALT).held)
-                    switch_to_locked_layer_under_click(camMouseAABB);
+                    switch_to_layer_under_click(camMouseAABB);
                 if(button.clicks >= 2 && !drawP.world.main.input.key(InputManager::KEY_GENERIC_LSHIFT).held && !drawP.world.main.input.key(InputManager::KEY_GENERIC_LALT).held) {
                     CanvasComponentContainer::ObjInfo* selectedObjectToEdit = drawP.selection.get_front_object_colliding_with_in_editing_layer(camMouseAABB);
 

@@ -60,7 +60,7 @@ class DrawingProgramSelection {
     private:
         bool commitChangeColorUpdate = false;
         // Set by the "Move to layer" buttons, and done in update() so the selection isn't changed while the GUI is being built
-        DrawingProgramLayerManager::LockedLayerType pendingMoveToLayer = DrawingProgramLayerManager::LockedLayerType::NONE;
+        DrawingProgramLayerListItem* pendingMoveToLayer = nullptr;
 
         void phone_bottom_toolbar_gui(PhoneDrawingProgramScreen& t);
         void translate_key(unsigned keyPressed, bool pressed);

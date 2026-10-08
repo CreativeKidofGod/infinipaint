@@ -38,7 +38,7 @@ void DrawingProgramLayerListItemUndoData::scale_up(const WorldScalar& scaleUpAmo
 
 DrawingProgramLayerListItem::DrawingProgramLayerListItem() {}
 
-DrawingProgramLayerListItem::DrawingProgramLayerListItem(NetworkingObjects::NetObjManager& netObjMan, const std::string& initName, bool isFolder) {
+DrawingProgramLayerListItem::DrawingProgramLayerListItem(NetworkingObjects::NetObjManager& netObjMan, const std::string& initName, bool isFolder, LayerKind initKind) {
     if(isFolder) {
         folderData = std::make_unique<DrawingProgramLayerFolder>();
         folderData->folderList = netObjMan.make_obj<NetworkingObjects::NetObjOrderedList<DrawingProgramLayerListItem>>();
@@ -50,6 +50,8 @@ DrawingProgramLayerListItem::DrawingProgramLayerListItem(NetworkingObjects::NetO
     nameData = netObjMan.make_obj<NameData>();
     nameData->name = initName;
     displayData = netObjMan.make_obj<DisplayData>();
+    kindData = netObjMan.make_obj<KindData>();
+    kindData->kind = static_cast<uint8_t>(initKind);
 }
 
 DrawingProgramLayerListItem::DrawingProgramLayerListItem(World& w, const DrawingProgramLayerListItemUndoData& initData) {
@@ -78,6 +80,8 @@ DrawingProgramLayerListItem::DrawingProgramLayerListItem(World& w, const Drawing
     displayData = w.netObjMan.make_obj<DisplayData>();
     displayData->alpha = initData.metaInfo.alpha;
     displayData->blendMode = initData.metaInfo.blendMode;
+    kindData = w.netObjMan.make_obj<KindData>();
+    kindData->kind = static_cast<uint8_t>(initData.metaInfo.kind);
 }
 
 DrawingProgramLayerListItemUndoData DrawingProgramLayerListItem::get_undo_data(WorldUndoManager& u) const {
@@ -85,6 +89,7 @@ DrawingProgramLayerListItemUndoData DrawingProgramLayerListItem::get_undo_data(W
     toRet.metaInfo.name = nameData->name;
     toRet.metaInfo.blendMode = displayData->blendMode;
     toRet.metaInfo.alpha = displayData->alpha;
+    toRet.metaInfo.kind = get_kind();
     if(folderData) {
         toRet.containerUndoID = u.get_undoid_from_netid(folderData->folderList.get_net_id());
         toRet.folderData = std::vector<DrawingProgramLayerListItemUndoData>();
@@ -111,6 +116,7 @@ void DrawingProgramLayerListItem::reassign_netobj_ids_call() {
         layerData->components.reassign_ids();
     nameData.reassign_ids();
     displayData.reassign_ids();
+    kindData.reassign_ids();
 }
 
 void DrawingProgramLayerListItem::set_to_erase() {
@@ -180,6 +186,10 @@ void DrawingProgramLayerListItem::load_file(cereal::PortableBinaryInputArchive& 
     displayData = layerMan.drawP.world.netObjMan.make_obj<DisplayData>();
     a(*displayData);
 
+    kindData = layerMan.drawP.world.netObjMan.make_obj<KindData>();
+    if(version >= VersionConstants::CUSTOM_LAYER_KIND_VERSION)
+        a(*kindData);
+
     bool isFolder;
     a(isFolder);
     if(isFolder) {
@@ -195,6 +205,7 @@ void DrawingProgramLayerListItem::load_file(cereal::PortableBinaryInputArchive& 
 void DrawingProgramLayerListItem::save_file(cereal::PortableBinaryOutputArchive& a) const {
     a(*nameData);
     a(*displayData);
+    a(*kindData);
     a(static_cast<bool>(folderData));
     if(folderData)
         folderData->save_file(a);
@@ -275,7 +286,22 @@ SerializedBlendMode DrawingProgramLayerListItem::get_blend_mode() const {
     return displayData->blendMode;
 }
 
+void DrawingProgramLayerListItem::set_kind(DrawingProgramLayerManager& layerMan, LayerKind newKind) const {
+    if(kindData && kindData->kind != static_cast<uint8_t>(newKind)) {
+        kindData->kind = static_cast<uint8_t>(newKind);
+        layerMan.drawP.world.delayedUpdateObjectManager.send_update_to_all<KindData>(kindData, false);
+        layerMan.drawP.world.set_to_layout_gui_if_focus();
+    }
+}
+
+LayerKind DrawingProgramLayerListItem::get_kind() const {
+    if(!kindData || kindData->kind > static_cast<uint8_t>(LayerKind::WRITING))
+        return LayerKind::ANY;
+    return static_cast<LayerKind>(kindData->kind);
+}
+
 void DrawingProgramLayerListItem::set_metainfo(DrawingProgramLayerManager& layerMan, const DrawingProgramLayerListItemMetaInfo& metaInfo) {
+    set_kind(layerMan, metaInfo.kind);
     set_blend_mode(layerMan, metaInfo.blendMode);
     set_alpha(layerMan, metaInfo.alpha);
     set_name(layerMan.drawP.world.delayedUpdateObjectManager, metaInfo.name);
@@ -285,7 +311,8 @@ DrawingProgramLayerListItemMetaInfo DrawingProgramLayerListItem::get_metainfo() 
     return DrawingProgramLayerListItemMetaInfo{
         .name = get_name(),
         .alpha = get_alpha(),
-        .blendMode = get_blend_mode()
+        .blendMode = get_blend_mode(),
+        .kind = get_kind()
     };
 }
 
@@ -310,6 +337,11 @@ void DrawingProgramLayerListItem::register_class(World& w) {
             w.set_to_layout_gui_if_focus();
         }
     });
+    w.delayedUpdateObjectManager.register_class<KindData>(w.netObjMan, NetworkingObjects::DelayUpdateSerializedClassManager::CustomConstructors<KindData>{
+        .postUpdateFunc = [&](KindData& o) {
+            w.set_to_layout_gui_if_focus();
+        }
+    });
     w.delayedUpdateObjectManager.register_class<DisplayData>(w.netObjMan, NetworkingObjects::DelayUpdateSerializedClassManager::CustomConstructors<DisplayData>{
         .postUpdateFunc = [&](DisplayData& o) {
             w.drawProg.drawCache.clear_own_cached_surfaces();
@@ -326,6 +358,7 @@ void DrawingProgramLayerListItem::write_constructor_func(const NetworkingObjects
         o->layerData->components.write_create_message(a);
     o->nameData.write_create_message(a);
     o->displayData.write_create_message(a);
+    o->kindData.write_create_message(a);
 }
 
 void DrawingProgramLayerListItem::read_constructor_func(const NetworkingObjects::NetObjTemporaryPtr<DrawingProgramLayerListItem>& o, cereal::PortableBinaryInputArchive& a, const std::shared_ptr<NetServer::ClientData>& c) {
@@ -341,4 +374,5 @@ void DrawingProgramLayerListItem::read_constructor_func(const NetworkingObjects:
     }
     o->nameData = o.get_obj_man()->read_create_message<NameData>(a, c);
     o->displayData = o.get_obj_man()->read_create_message<DisplayData>(a, c);
+    o->kindData = o.get_obj_man()->read_create_message<KindData>(a, c);
 }

@@ -31,10 +31,19 @@ class DrawingProgramLayer;
 class World;
 class DrawingProgramLayerManager;
 
+// Custom fork: what a layer is meant for. Any = anything, never asks.
+// Stored in custom save files (see VersionConstants::CUSTOM_LAYER_KIND_VERSION).
+enum class LayerKind : uint8_t {
+    ANY = 0,
+    PICTURES = 1,
+    WRITING = 2
+};
+
 struct DrawingProgramLayerListItemMetaInfo {
     std::string name;
     float alpha = 1.0f;
     SerializedBlendMode blendMode = SerializedBlendMode::BLEND_SRC_OVER;
+    LayerKind kind = LayerKind::ANY;
     bool operator==(const DrawingProgramLayerListItemMetaInfo&) const = default;
 };
 
@@ -50,7 +59,7 @@ struct DrawingProgramLayerListItemUndoData {
 class DrawingProgramLayerListItem {
     public:
         DrawingProgramLayerListItem();
-        DrawingProgramLayerListItem(NetworkingObjects::NetObjManager& netObjMan, const std::string& initName, bool isFolder);
+        DrawingProgramLayerListItem(NetworkingObjects::NetObjManager& netObjMan, const std::string& initName, bool isFolder, LayerKind initKind = LayerKind::ANY);
         DrawingProgramLayerListItem(World& w, const DrawingProgramLayerListItemUndoData& undoData);
         DrawingProgramLayerListItemUndoData get_undo_data(WorldUndoManager& u) const;
         bool is_folder() const;
@@ -80,6 +89,9 @@ class DrawingProgramLayerListItem {
         void set_blend_mode(DrawingProgramLayerManager& layerMan, SerializedBlendMode newBlendMode) const;
         SerializedBlendMode get_blend_mode() const;
 
+        void set_kind(DrawingProgramLayerManager& layerMan, LayerKind newKind) const;
+        LayerKind get_kind() const;
+
         void set_metainfo(DrawingProgramLayerManager& layerMan, const DrawingProgramLayerListItemMetaInfo& metaInfo);
         DrawingProgramLayerListItemMetaInfo get_metainfo() const;
 
@@ -105,6 +117,13 @@ class DrawingProgramLayerListItem {
                 a(alpha, visible, blendMode);
             }
         };
+        struct KindData {
+            uint8_t kind = static_cast<uint8_t>(LayerKind::ANY);
+            template <typename Archive> void serialize(Archive& a) {
+                a(kind);
+            }
+        };
         NetworkingObjects::NetObjOwnerPtr<NameData> nameData;
         NetworkingObjects::NetObjOwnerPtr<DisplayData> displayData;
+        NetworkingObjects::NetObjOwnerPtr<KindData> kindData;
 };
