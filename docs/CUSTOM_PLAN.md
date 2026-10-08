@@ -44,7 +44,7 @@ choices stay true to what Levi asked for.
 - **WARNING:** the portable build keeps config, and the default save folder, next to the exe.
   Replacing the app folder can delete canvases saved there. Warn Levi before every update until Phase 2 fixes it.
 
-## Phase 1: locked layers (built, waiting for Levi's test)
+## Phase 1: locked layers (done, confirmed by Levi on build -9, 2026-10-08)
 
 - **Four layers at the top of the list, bottom to top: Base, Overlay, Calendar, Writing.**
   They are normal layers recognized by their exact name, so canvases still open in official InfiniPaint.

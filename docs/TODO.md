@@ -17,7 +17,8 @@ unchecked item in each update until Levi confirms it.
 - [x] Downloaded and tested run #5: all worked except right-click Move To buttons.
 - [x] Build -6: right-click Move To buttons work (2026-10-08).
 - [x] Build -7: "Are you sure?" when moving lines/shapes off Writing works (2026-10-08).
-- [ ] Test "Are you sure?" for pictures/files going onto Writing or Calendar (build -9).
+- [x] Build -9: everything works (2026-10-08). Phase 1 done.
+- [ ] Keep the -9 folder (its download link expires 2026-11-07). Delete -6, -7, -8 after checking no drawings are inside.
 
 ## Standing reminders
 
