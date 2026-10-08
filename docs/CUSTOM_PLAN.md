@@ -115,6 +115,7 @@ choices stay true to what Levi asked for.
      original pixels (crop, no quality loss).
    - Idea to decide later: on import, offer "trace to vector" for simple graphics (diagrams, logos, text) so they
      zoom sharply. Photos can only be AI-upscaled, which adds made-up detail.
+     Levi (2026-10-08): he mostly imports PDFs and simple diagram images, so tracing diagrams is the useful case.
 5. **Export a region as PDF** (SVG/PNG/JPG/WEBP export already exist; Skia has a PDF backend).
 6. **Ctrl+F search.**
    - Covers typed text, PDF text, and handwriting (Windows' built-in, offline handwriting recognition).
