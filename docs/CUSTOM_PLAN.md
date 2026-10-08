@@ -68,7 +68,9 @@ choices stay true to what Levi asked for.
   - With the Edit tool, one click on any image, file or text selects it, even if it's on another locked layer
     (the app switches to that layer). It checks the current layer first, then Writing, Calendar, Overlay, Base.
   - Moving lines, shapes or text to any layer other than Writing asks "Are you sure?" (Yes, Move / Cancel) first.
-    Why: those belong on Writing, so moving them off it is usually a mistake. Images move without asking.
+    Why: those belong on Writing, so moving them off it is usually a mistake.
+  - Putting pictures/files on Writing or Calendar also asks "Are you sure?", both when inserting
+    (Yes, Put It There / Go Back) and when moving. Base and Overlay never ask.
   - Pasting an image already exists in InfiniPaint: Ctrl+Shift+V, or right-click > Paste Image.
 - Build: one zip instead of a zip in a zip, newer GitHub build tools, and tags starting with "v" publish a Release that never expires.
 

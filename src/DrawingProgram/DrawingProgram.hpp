@@ -187,6 +187,9 @@ class DrawingProgram {
         void insert_pending_into_layer(DrawingProgramLayerListItem* layer);
         void insert_layer_choice_popup_gui();
         DrawingProgramLayerListItem* pendingMoveConfirmLayer = nullptr;
+        bool pendingMoveConfirmIsImages = false;
+        DrawingProgramLayerListItem* pendingInsertConfirmLayer = nullptr;
+        static bool is_writing_or_calendar(DrawingProgramLayerManager& layerMan, DrawingProgramLayerListItem* layer);
         Vector2f pendingMoveConfirmPos = {0.0f, 0.0f};
         void move_confirm_popup_gui();
 

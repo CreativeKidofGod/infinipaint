@@ -824,6 +824,7 @@ bool DrawingProgram::hold_image_paste_to_ask_layer(const CustomEvents::PasteEven
 void DrawingProgram::insert_pending_into_layer(DrawingProgramLayerListItem* layer) {
     std::vector<PendingInsert> toInsert = std::move(pendingInserts);
     pendingInserts.clear();
+    pendingInsertConfirmLayer = nullptr;
     world.main.g.gui.set_to_layout();
     if(!layer)
         return; // Cancelled
@@ -845,16 +846,22 @@ void DrawingProgram::insert_pending_into_layer(DrawingProgramLayerListItem* laye
 void DrawingProgram::request_move_selection_to_layer(DrawingProgramLayerListItem* layer, Vector2f guiPos) {
     if(!layer || !selection.is_something_selected())
         return;
+    // Ask first when lines/shapes/text leave Writing, or pictures/files go onto Writing or Calendar
+    bool targetIsWriting = layerMan.get_locked_layer_type(layer) == DrawingProgramLayerManager::LockedLayerType::WRITING;
+    bool targetIsWritingOrCalendar = is_writing_or_calendar(layerMan, layer);
     bool movingWriting = false;
-    if(layerMan.get_locked_layer_type(layer) != DrawingProgramLayerManager::LockedLayerType::WRITING) {
-        for(auto* c : selection.get_selection_as_set()) {
-            if(c->obj->get_comp().get_type() != CanvasComponentType::IMAGE && c->obj->parentLayer != layer) {
-                movingWriting = true;
-                break;
-            }
-        }
+    bool movingImages = false;
+    for(auto* c : selection.get_selection_as_set()) {
+        if(c->obj->parentLayer == layer)
+            continue;
+        bool isImage = c->obj->get_comp().get_type() == CanvasComponentType::IMAGE;
+        if(!isImage && !targetIsWriting)
+            movingWriting = true;
+        if(isImage && targetIsWritingOrCalendar)
+            movingImages = true;
     }
-    if(movingWriting) {
+    if(movingWriting || movingImages) {
+        pendingMoveConfirmIsImages = !movingWriting;
         pendingMoveConfirmLayer = layer;
         pendingMoveConfirmPos = guiPos;
         world.main.g.gui.set_to_layout();
@@ -870,7 +877,10 @@ void DrawingProgram::move_confirm_popup_gui() {
     GUIStuff::GUIManager& gui = world.main.g.gui;
 
     right_click_action_menu(pendingMoveConfirmPos, [&] {
-        text_label_light(gui, "Lines, shapes and text usually stay on Writing.");
+        if(pendingMoveConfirmIsImages)
+            text_label_light(gui, "Pictures and files usually go on Base or Overlay.");
+        else
+            text_label_light(gui, "Lines, shapes and text usually stay on Writing.");
         text_label_light(gui, std::string("Move them to ") + pendingMoveConfirmLayer->get_name() + "? Are you sure?");
         popup_menu_action_button("Confirm move to layer", "Yes, Move", [&] {
             DrawingProgramLayerListItem* layer = pendingMoveConfirmLayer;
@@ -887,11 +897,33 @@ void DrawingProgram::move_confirm_popup_gui() {
     });
 }
 
+bool DrawingProgram::is_writing_or_calendar(DrawingProgramLayerManager& layerMan, DrawingProgramLayerListItem* layer) {
+    auto type = layerMan.get_locked_layer_type(layer);
+    return type == DrawingProgramLayerManager::LockedLayerType::WRITING || type == DrawingProgramLayerManager::LockedLayerType::CALENDAR;
+}
+
 void DrawingProgram::insert_layer_choice_popup_gui() {
     using namespace GUIStuff;
     using namespace ElementHelpers;
 
     GUIStuff::GUIManager& gui = world.main.g.gui;
+
+    if(pendingInsertConfirmLayer) {
+        right_click_action_menu(pendingInsertPopupPos, [&] {
+            text_label_light(gui, "Pictures and files usually go on Base or Overlay.");
+            text_label_light(gui, std::string("Put them on ") + pendingInsertConfirmLayer->get_name() + "? Are you sure?");
+            popup_menu_action_button("Confirm insert layer", "Yes, Put It There", [&] {
+                DrawingProgramLayerListItem* layer = pendingInsertConfirmLayer;
+                pendingInsertConfirmLayer = nullptr;
+                insert_pending_into_layer(layer);
+            });
+            popup_menu_action_button("Back to insert layer choice", "Go Back", [&] {
+                pendingInsertConfirmLayer = nullptr;
+                world.main.g.gui.set_to_layout();
+            });
+        });
+        return;
+    }
 
     right_click_action_menu(pendingInsertPopupPos, [&] {
         text_label_light(gui, pendingInserts.size() == 1 ? "Put it on which layer?" : "Put these on which layer?");
@@ -900,7 +932,13 @@ void DrawingProgram::insert_layer_choice_popup_gui() {
                 continue;
             const char* name = DrawingProgramLayerManager::locked_layer_name(type);
             popup_menu_action_button(name, name, [&, type] {
-                insert_pending_into_layer(layerMan.find_locked_layer(type));
+                DrawingProgramLayerListItem* layer = layerMan.find_locked_layer(type);
+                if(is_writing_or_calendar(layerMan, layer)) {
+                    pendingInsertConfirmLayer = layer;
+                    world.main.g.gui.set_to_layout();
+                }
+                else
+                    insert_pending_into_layer(layer);
             });
         }
         // Also offer the layer being edited if it's one the user made
