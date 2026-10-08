@@ -17,7 +17,7 @@ unchecked item in each update until Levi confirms it.
 - [x] Downloaded and tested run #5: all worked except right-click Move To buttons.
 - [x] Build -6: right-click Move To buttons work (2026-10-08).
 - [x] Build -7: "Are you sure?" when moving lines/shapes off Writing works (2026-10-08).
-- [ ] Test "Are you sure?" for pictures/files going onto Writing or Calendar (build -8).
+- [ ] Test "Are you sure?" for pictures/files going onto Writing or Calendar (build -9).
 
 ## Standing reminders
 
