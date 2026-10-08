@@ -72,6 +72,10 @@ choices stay true to what Levi asked for.
   - Putting pictures/files on Writing or Calendar also asks "Are you sure?", both when inserting
     (Yes, Put It There / Go Back) and when moving. Base and Overlay never ask.
   - Pasting an image already exists in InfiniPaint: Ctrl+Shift+V, or right-click > Paste Image.
+- Deleting one of the four layers deletes what's on it (Undo brings it back). Routing then uses the current layer,
+  its Move To / insert buttons disappear, and it comes back empty next time the canvas is opened.
+  Open "Are you sure?" questions about a deleted layer close safely.
+- "Are you sure?" and Move To only cover the four locked layers. Layers Levi makes have no Move To button yet.
 - Build: one zip instead of a zip in a zip, newer GitHub build tools, and tags starting with "v" publish a Release that never expires.
 
 ## Planned features (in order)
@@ -106,6 +110,11 @@ choices stay true to what Levi asked for.
    - Checked 2026-10-08 (Windows build): PNG, JPG, WEBP, GIF, BMP and ICO show as pictures. SVG shows, with the limits above.
      PDF, HEIC (iPhone photos), AVIF, TIFF, JPEG XL, Word/PowerPoint and video show only a file icon.
      Add HEIC/AVIF here too if they're easy and sell-friendly (Levi may paste phone photos).
+   - **Snip tool (Levi, 2026-10-08):** select part of a PDF page or image on the board and copy it as its own
+     object to move, edit or reuse elsewhere. PDF snips stay vector (sharp at any zoom); image snips keep the
+     original pixels (crop, no quality loss).
+   - Idea to decide later: on import, offer "trace to vector" for simple graphics (diagrams, logos, text) so they
+     zoom sharply. Photos can only be AI-upscaled, which adds made-up detail.
 5. **Export a region as PDF** (SVG/PNG/JPG/WEBP export already exist; Skia has a PDF backend).
 6. **Ctrl+F search.**
    - Covers typed text, PDF text, and handwriting (Windows' built-in, offline handwriting recognition).

@@ -485,6 +485,16 @@ void DrawingProgram::toolbar_gui(Toolbar& t) {
 }
 
 void DrawingProgram::right_click_popup_gui(Toolbar& t) {
+    // A layer can be deleted while a question about it is open. Drop the question instead of using a deleted layer.
+    auto layerExists = [&](DrawingProgramLayerListItem* layer) {
+        auto allLayers = layerMan.get_flattened_layer_list();
+        return std::find(allLayers.begin(), allLayers.end(), layer) != allLayers.end();
+    };
+    if(pendingMoveConfirmLayer && !layerExists(pendingMoveConfirmLayer))
+        pendingMoveConfirmLayer = nullptr;
+    if(pendingInsertConfirmLayer && !layerExists(pendingInsertConfirmLayer))
+        pendingInsertConfirmLayer = nullptr;
+
     if(!pendingInserts.empty())
         insert_layer_choice_popup_gui();
     else if(pendingMoveConfirmLayer)
