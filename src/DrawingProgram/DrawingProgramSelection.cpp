@@ -57,10 +57,10 @@ void DrawingProgramSelection::selection_gui(Toolbar& t) {
     auto& gui = drawP.world.main.g.gui;
 
     gui.new_id("general selection gui", [&] {
-        text_label(gui, "Select from:");
+        text_label(gui, "Select From:");
         radio_button_selector(gui, "layer selector", &drawP.controls.layerSelector, {
-            {"Layer being edited", DrawingProgramLayerManager::LayerSelector::LAYER_BEING_EDITED},
-            {"All visible layers", DrawingProgramLayerManager::LayerSelector::ALL_VISIBLE_LAYERS}
+            {"Layer Being Edited", DrawingProgramLayerManager::LayerSelector::LAYER_BEING_EDITED},
+            {"All Visible Layers", DrawingProgramLayerManager::LayerSelector::ALL_VISIBLE_LAYERS}
         });
         if(is_something_selected()) {
             left_to_right_line_layout(gui, [&]() {
@@ -76,7 +76,7 @@ void DrawingProgramSelection::selection_gui(Toolbar& t) {
                 });
                 text_label(gui, "Stroke Color");
             });
-            text_label(gui, "Move to layer:");
+            text_label(gui, "Move To Layer:");
             left_to_right_line_layout(gui, [&]() {
                 for(auto type : DrawingProgramLayerManager::LOCKED_LAYERS_TOP_TO_BOTTOM | std::views::reverse) {
                     if(!drawP.layerMan.find_locked_layer(type))
@@ -100,10 +100,10 @@ void DrawingProgramSelection::phone_selection_gui(PhoneDrawingProgramScreen& t) 
     auto& gui = drawP.world.main.g.gui;
 
     gui.new_id("general selection gui", [&] {
-        text_label(gui, "Select from:");
+        text_label(gui, "Select From:");
         radio_button_selector(gui, "layer selector", &drawP.controls.layerSelector, {
-            {"Layer being edited", DrawingProgramLayerManager::LayerSelector::LAYER_BEING_EDITED},
-            {"All visible layers", DrawingProgramLayerManager::LayerSelector::ALL_VISIBLE_LAYERS}
+            {"Layer Being Edited", DrawingProgramLayerManager::LayerSelector::LAYER_BEING_EDITED},
+            {"All Visible Layers", DrawingProgramLayerManager::LayerSelector::ALL_VISIBLE_LAYERS}
         });
     });
 }

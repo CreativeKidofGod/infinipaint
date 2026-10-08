@@ -153,7 +153,7 @@ void GridModifyTool::gui_toolbox(Toolbar& t) {
             WorldGrid& g = *gLock;
             input_text_field(gui, "grid name", "Name", &g.name);
             checkbox_boolean_field(gui, "Visible", "Visible", &g.visible);
-            checkbox_boolean_field(gui, "Display in Front", "Display in front of canvas", &g.displayInFront);
+            checkbox_boolean_field(gui, "Display in Front", "Display In Front Of Canvas", &g.displayInFront);
             std::vector<std::string> listOfGridTypes = {
                 "Circle Points",
                 "Square Points",
@@ -167,7 +167,7 @@ void GridModifyTool::gui_toolbox(Toolbar& t) {
             input_scalar_field<uint32_t>(gui, "Subdivisions", "Subdivisions", &g.subdivisions, 1, 10, {
                 .onEdit = [&] { g.set_subdivisions(g.subdivisions); }
             });
-            checkbox_boolean_field(gui, "Subdivide outwards", "Subdivide when zooming out", &g.removeDivisionsOutwards, [&] {
+            checkbox_boolean_field(gui, "Subdivide outwards", "Subdivide When Zooming Out", &g.removeDivisionsOutwards, [&] {
                 g.set_remove_divisions_outwards(g.removeDivisionsOutwards);
             });
             left_to_right_line_layout(gui, [&]() {
@@ -202,7 +202,7 @@ void GridModifyTool::gui_phone_toolbox(PhoneDrawingProgramScreen& t) {
             WorldGrid& g = *gLock;
             input_text_field(gui, "grid name", "Name", &g.name);
             checkbox_boolean_field(gui, "Visible", "Visible", &g.visible);
-            checkbox_boolean_field(gui, "Display in Front", "Display in front of canvas", &g.displayInFront);
+            checkbox_boolean_field(gui, "Display in Front", "Display In Front Of Canvas", &g.displayInFront);
             std::vector<std::string> listOfGridTypes = {
                 "Circle Points",
                 "Square Points",
@@ -216,7 +216,7 @@ void GridModifyTool::gui_phone_toolbox(PhoneDrawingProgramScreen& t) {
             input_scalar_field<uint32_t>(gui, "Subdivisions", "Subdivisions", &g.subdivisions, 1, 10, {
                 .onEdit = [&] { g.set_subdivisions(g.subdivisions); }
             });
-            checkbox_boolean_field(gui, "Subdivide outwards", "Subdivide when zooming out", &g.removeDivisionsOutwards, [&] {
+            checkbox_boolean_field(gui, "Subdivide outwards", "Subdivide When Zooming Out", &g.removeDivisionsOutwards, [&] {
                 g.set_remove_divisions_outwards(g.removeDivisionsOutwards);
             });
             left_to_right_line_layout(gui, [&]() {

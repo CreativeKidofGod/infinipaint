@@ -533,7 +533,7 @@ void DrawingProgram::selection_action_menu(Vector2f popupPos) {
     GUIStuff::GUIManager& gui = world.main.g.gui;
 
     right_click_action_menu(popupPos, [&] {
-        text_label_light(gui, "Selection menu");
+        text_label_light(gui, "Selection Menu");
         popup_menu_action_button("Paste", "Paste", [&, popupPos] {
             selection.deselect_all();
             selection.paste_clipboard(popupPos * world.main.g.final_gui_scale());
@@ -555,17 +555,17 @@ void DrawingProgram::selection_action_menu(Vector2f popupPos) {
             popup_menu_action_button("Delete", "Delete", [&] {
                 selection.delete_all();
             });
-            popup_menu_action_button("Bring to front of layer", "Bring to front of layer", [&] {
+            popup_menu_action_button("Bring to front of layer", "Bring To Front Of Layer", [&] {
                 selection.push_selection_to_front();
             });
-            popup_menu_action_button("Send to back of layer", "Send to back of layer", [&] {
+            popup_menu_action_button("Send to back of layer", "Send To Back Of Layer", [&] {
                 selection.push_selection_to_back();
             });
             for(auto type : DrawingProgramLayerManager::LOCKED_LAYERS_TOP_TO_BOTTOM | std::views::reverse) {
                 if(!layerMan.find_locked_layer(type))
                     continue;
                 const char* name = DrawingProgramLayerManager::locked_layer_name(type);
-                std::string id = std::string("Move to ") + name + " layer";
+                std::string id = std::string("Move To ") + name + " Layer";
                 popup_menu_action_button(id.c_str(), id.c_str(), [&, type] {
                     selection.move_selection_to_layer(layerMan.find_locked_layer(type));
                 });
@@ -852,7 +852,7 @@ void DrawingProgram::insert_layer_choice_popup_gui() {
         // Also offer the layer being edited if it's one the user made
         DrawingProgramLayerListItem* editing = layerMan.get_editing_layer();
         if(editing && layerMan.get_locked_layer_type(editing) == DrawingProgramLayerManager::LockedLayerType::NONE) {
-            std::string text = "Current layer (" + editing->get_name() + ")";
+            std::string text = "Current Layer (" + editing->get_name() + ")";
             popup_menu_action_button("Insert into current layer", text.c_str(), [&, editing] {
                 insert_pending_into_layer(editing);
             });

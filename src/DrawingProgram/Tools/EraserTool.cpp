@@ -47,12 +47,12 @@ void EraserTool::gui_toolbox(Toolbar& t) {
     gui.new_id("eraser tool", [&] {
         text_label_centered(gui, "Eraser");
         drawP.world.main.toolConfig.relative_width_gui(drawP, "Size");
-        text_label(gui, "Erase from:");
+        text_label(gui, "Erase From:");
         radio_button_selector(gui, "layer selector", &drawP.controls.layerSelector, {
-            {"Layer being edited", DrawingProgramLayerManager::LayerSelector::LAYER_BEING_EDITED},
-            {"All visible layers", DrawingProgramLayerManager::LayerSelector::ALL_VISIBLE_LAYERS}
+            {"Layer Being Edited", DrawingProgramLayerManager::LayerSelector::LAYER_BEING_EDITED},
+            {"All Visible Layers", DrawingProgramLayerManager::LayerSelector::ALL_VISIBLE_LAYERS}
         });
-        checkbox_boolean_field(gui, "erase details", "Erase details (meshes only)", &drawP.world.main.toolConfig.eraser.eraseDetail);
+        checkbox_boolean_field(gui, "erase details", "Erase Details (Meshes Only)", &drawP.world.main.toolConfig.eraser.eraseDetail);
     });
 }
 
@@ -64,12 +64,12 @@ void EraserTool::gui_phone_toolbox(PhoneDrawingProgramScreen& t) {
 
     gui.new_id("eraser tool", [&] {
         drawP.world.main.toolConfig.relative_width_gui(drawP, "Size");
-        text_label(gui, "Erase from:");
+        text_label(gui, "Erase From:");
         radio_button_selector(gui, "layer selector", &drawP.controls.layerSelector, {
-            {"Layer being edited", DrawingProgramLayerManager::LayerSelector::LAYER_BEING_EDITED},
-            {"All visible layers", DrawingProgramLayerManager::LayerSelector::ALL_VISIBLE_LAYERS}
+            {"Layer Being Edited", DrawingProgramLayerManager::LayerSelector::LAYER_BEING_EDITED},
+            {"All Visible Layers", DrawingProgramLayerManager::LayerSelector::ALL_VISIBLE_LAYERS}
         });
-        checkbox_boolean_field(gui, "erase details", "Erase details (meshes only)", &drawP.world.main.toolConfig.eraser.eraseDetail);
+        checkbox_boolean_field(gui, "erase details", "Erase Details (Meshes Only)", &drawP.world.main.toolConfig.eraser.eraseDetail);
     });
 }
 

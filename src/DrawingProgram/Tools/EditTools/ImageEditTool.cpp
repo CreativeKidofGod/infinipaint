@@ -73,7 +73,7 @@ void ImageEditTool::edit_gui(Toolbar& t) {
 
         if(resourceData) {
             text_label(gui, "Name: " + resourceData->name);
-            text_button(gui, "file download", "Download file", {
+            text_button(gui, "file download", "Download File", {
                 .wide = true,
                 .onClick = [&, resourceData] {
                     #ifdef __EMSCRIPTEN__

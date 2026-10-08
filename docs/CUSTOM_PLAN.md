@@ -14,6 +14,11 @@ choices stay true to what Levi asked for.
   He only downloads the portable zip and tests it.
 - Stop after each phase until he confirms the build works.
 
+## Style rules
+
+- **All tool, button, menu and setting names use Title Case** (e.g. "Bring To Front Of Layer"). Levi's choice, 2026-10-08.
+  Explanatory sentences and questions stay in normal sentence case. New features must follow this.
+
 ## Goals behind everything
 
 1. **One canvas can hold a whole semester or season of life.** Centralize everything in one sandbox.

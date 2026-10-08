@@ -48,9 +48,9 @@ void EllipseDrawEditTool::edit_gui(Toolbar& t) {
     gui.new_id("edit tool ellipse", [&] {
         text_label_centered(gui, "Edit Ellipse");
         radio_button_selector(gui, "Fill selector", &a.d.fillStrokeMode, {
-            {"Fill only", 0},
-            {"Outline only", 1},
-            {"Fill and outline", 2}
+            {"Fill Only", 0},
+            {"Outline Only", 1},
+            {"Fill And Outline", 2}
         }, commit_update_and_layout_func);
         if(a.d.fillStrokeMode == 0 || a.d.fillStrokeMode == 2) {
             left_to_right_line_layout(gui, [&] {
@@ -91,9 +91,9 @@ void EllipseDrawEditTool::gui_phone_toolbox(PhoneDrawingProgramScreen& t) {
 
     gui.new_id("edit tool ellipse", [&] {
         radio_button_selector(gui, "Fill selector", &a.d.fillStrokeMode, {
-            {"Fill only", 0},
-            {"Outline only", 1},
-            {"Fill and outline", 2}
+            {"Fill Only", 0},
+            {"Outline Only", 1},
+            {"Fill And Outline", 2}
         }, commit_update_and_layout_func);
         if(a.d.fillStrokeMode == 0 || a.d.fillStrokeMode == 2) {
             left_to_right_line_layout(gui, [&] {

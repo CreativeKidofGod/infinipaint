@@ -37,14 +37,14 @@ DrawingProgramToolType ZoomCanvasTool::get_type() {
 void ZoomCanvasTool::gui_toolbox(Toolbar& t) {
     auto& gui = drawP.world.main.g.gui;
     gui.new_id("Zoom canvas tool", [&] {
-        GUIStuff::ElementHelpers::text_label_centered(gui, "Zoom tool");
+        GUIStuff::ElementHelpers::text_label_centered(gui, "Zoom Tool");
     });
 }
 
 void ZoomCanvasTool::gui_phone_toolbox(PhoneDrawingProgramScreen& t) {
     auto& gui = drawP.world.main.g.gui;
     gui.new_id("Zoom canvas tool", [&] {
-        GUIStuff::ElementHelpers::text_label_centered(gui, "Zoom tool");
+        GUIStuff::ElementHelpers::text_label_centered(gui, "Zoom Tool");
     });
 }
 

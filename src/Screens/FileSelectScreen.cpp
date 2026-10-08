@@ -1145,19 +1145,19 @@ void FileSelectScreen::settings_view() {
                         .layoutDirection = CLAY_TOP_TO_BOTTOM
                     },
                 }) {
-                    input_text_field(gui, "display name input", "Display name", &main.conf.displayName);
-                    color_picker_button_field(gui, "defaultCanvasBackgroundColor", "Default canvas background color", &main.conf.defaultCanvasBackgroundColor, { .hasAlpha = false });
+                    input_text_field(gui, "display name input", "Display Name", &main.conf.displayName);
+                    color_picker_button_field(gui, "defaultCanvasBackgroundColor", "Default Canvas Background Color", &main.conf.defaultCanvasBackgroundColor, { .hasAlpha = false });
                     input_scalar_field(gui, "Max GUI Scale", "Max GUI Scale", &main.conf.guiScale, 1.0f, 2.0f, {
                         .decimalPrecision = 1,
                         .onEdit = [&] { main.g.window_update(); }
                     });
-                    input_scalar_field(gui, "jump transition time", "Jump transition time", &main.conf.jumpTransitionTime, 0.01f, 1000.0f, {.decimalPrecision = 2});
-                    checkbox_boolean_field(gui, "disable touch when pen in proximity", "Disable touch when pen in proximity", &main.conf.tabletOptions.disableTouchWhenPenInProximity);
-                    checkbox_boolean_field(gui, "make all tools share same size", "Make all tools share size", &main.toolConfig.globalConf.useGlobalRelativeWidth);
+                    input_scalar_field(gui, "jump transition time", "Jump Transition Time", &main.conf.jumpTransitionTime, 0.01f, 1000.0f, {.decimalPrecision = 2});
+                    checkbox_boolean_field(gui, "disable touch when pen in proximity", "Disable Touch When Pen In Proximity", &main.conf.tabletOptions.disableTouchWhenPenInProximity);
+                    checkbox_boolean_field(gui, "make all tools share same size", "Make All Tools Share Size", &main.toolConfig.globalConf.useGlobalRelativeWidth);
                     slider_scalar_field(gui, "tablet brush minimum size", "Brush relative minimum size", &main.conf.tabletOptions.brushMinimumSize, 0.0f, 1.0f, {.decimalPrecision = 3});
                     slider_scalar_field(gui, "tablet brush pressure smoothing factor", "Brush pressure smoothing factor", &main.conf.tabletOptions.brushPressureSmoothingFactor, 0.0f, 1.0f, {.decimalPrecision = 3});
-                    checkbox_boolean_field(gui, "pen pressure width", "Pen pressure affects brush size", &main.conf.tabletOptions.pressureAffectsBrushWidth);
-                    checkbox_boolean_field(gui, "disable touch for drawing", "Disable touch for drawing", &main.conf.disableTouchForDrawing);
+                    checkbox_boolean_field(gui, "pen pressure width", "Pen Pressure Affects Brush Size", &main.conf.tabletOptions.pressureAffectsBrushWidth);
+                    checkbox_boolean_field(gui, "disable touch for drawing", "Disable Touch For Drawing", &main.conf.disableTouchForDrawing);
                     text_label(gui, "VSync:");
                     radio_button_selector(gui, "VSync selector", &main.conf.vsyncValue, {
                         {"On", 1},
@@ -1173,13 +1173,13 @@ void FileSelectScreen::settings_view() {
                             main.update_main_loop_call_rate(main.conf.mainCallbackRate);
                         }
                     });
-                    checkbox_boolean_field(gui, "real time eraser", "Eraser works in real time", &main.conf.realTimeEraser);
+                    checkbox_boolean_field(gui, "real time eraser", "Eraser Works In Real Time", &main.conf.realTimeEraser);
                     #ifndef __ANDROID__
                         input_scalar_field<unsigned>(gui, "Background FPS cap", "Background FPS Cap", &main.conf.mainCallbackRateBackground, 1, 100000);
-                        checkbox_boolean_field(gui, "use mobile UI", "Use mobile UI (requires restart)", &main.conf.mobileUI);
+                        checkbox_boolean_field(gui, "use mobile UI", "Use Mobile UI (Requires Restart)", &main.conf.mobileUI);
                     #endif
                     #ifndef __EMSCRIPTEN__
-                        checkbox_boolean_field(gui, "update notifications enable", "Check for updates on startup", &main.conf.checkForUpdates);
+                        checkbox_boolean_field(gui, "update notifications enable", "Check For Updates On Startup", &main.conf.checkForUpdates);
                     #endif
                 }
             }

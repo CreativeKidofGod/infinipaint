@@ -676,12 +676,12 @@ void TextBoxEditTool::right_click_popup_gui(Toolbar& t, Vector2f popupPos) {
     auto& a = static_cast<TextBoxCanvasComponent&>(comp->obj->get_comp());
 
     drawP.right_click_action_menu(popupPos, [&] {
-        text_label_light(gui, "Text menu");
+        text_label_light(gui, "Text Menu");
         InputManager& input = drawP.world.main.input;
         drawP.popup_menu_action_button("Paste", "Paste", [&] {
             drawP.world.main.input.call_paste(CustomEvents::PasteEvent::DataType::TEXT, { .allowRichText = true });
         });
-        drawP.popup_menu_action_button("Paste without formatting", "Paste without formatting", [&] {
+        drawP.popup_menu_action_button("Paste without formatting", "Paste Without Formatting", [&] {
             drawP.world.main.input.call_paste(CustomEvents::PasteEvent::DataType::TEXT, { .allowRichText = false });
         });
         if(a.cursor->selectionBeginPos != a.cursor->selectionEndPos) {

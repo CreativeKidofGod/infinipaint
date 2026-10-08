@@ -68,7 +68,7 @@ void EditTool::gui_phone_toolbox(PhoneDrawingProgramScreen& t) {
         compEditTool->gui_phone_toolbox(t);
     else {
         gui.new_id("edit tool", [&] {
-            text_label_centered(gui, "Double tap object to edit");
+            text_label_centered(gui, "Double Tap Object To Edit");
         });
     }
 }

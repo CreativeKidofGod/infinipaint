@@ -270,7 +270,7 @@ void Toolbar::close_popup_gui() {
         return wPair.w.expired();
     });
     center_obstructing_window_gui("Close program popup GUI", CLAY_SIZING_FIT(0), CLAY_SIZING_FIT(0, 600), [&] {
-        text_label(gui, "Files may contain unsaved changes");
+        text_label(gui, "Files May Contain Unsaved Changes");
         gui.clipping_element<ScrollArea>("close file popup gui scroll area", ScrollArea::Options{
             .scrollVertical = true,
             .clipVertical = true,
@@ -676,7 +676,7 @@ void Toolbar::update_notification_gui() {
     center_obstructing_window_gui("Update notifications GUI", CLAY_SIZING_FIXED(700), CLAY_SIZING_FIT(0), [&] {
         gui.new_id("update notification gui", [&] {
             text_label_centered(gui, "Update v" + main.updateCheckerData.newVersionStr + " available!");
-            text_button(gui, "download", "Open download page in web browser", {
+            text_button(gui, "download", "Open Download Page In Web Browser", {
                 .wide = true,
                 .onClick = [&]{
                     SDL_OpenURL(MainProgram::UPDATE_DOWNLOAD_URL);
@@ -690,7 +690,7 @@ void Toolbar::update_notification_gui() {
                     main.updateCheckerData.showGui = false;
                 }
             });
-            text_button(gui, "ignore for now", "Ignore for now", {
+            text_button(gui, "ignore for now", "Ignore For Now", {
                 .wide = true,
                 .onClick = [&]{
                     main.updateCheckerData.showGui = false;
@@ -1499,27 +1499,27 @@ void Toolbar::general_settings_inner_gui() {
             switch(generalSettingsOptions) {
                 case GSETTINGS_GENERAL: {
                     general_scroll_area("general settings", [&] {
-                        input_text_field(gui, "display name input", "Display name", &main.conf.displayName, {
+                        input_text_field(gui, "display name input", "Display Name", &main.conf.displayName, {
                             .onEdit = [&] {
                                 main.update_display_names();
                             }
                         });
-                        color_picker_button_field(gui, "defaultCanvasBackgroundColor", "Default canvas background color", &main.conf.defaultCanvasBackgroundColor, { .hasAlpha = false });
+                        color_picker_button_field(gui, "defaultCanvasBackgroundColor", "Default Canvas Background Color", &main.conf.defaultCanvasBackgroundColor, { .hasAlpha = false });
                         #ifndef __EMSCRIPTEN__
-                            checkbox_boolean_field(gui, "native file pick", "Use native file picker", &main.conf.useNativeFilePicker);
-                            checkbox_boolean_field(gui, "update notifications enable", "Check for updates on startup", &main.conf.checkForUpdates);
+                            checkbox_boolean_field(gui, "native file pick", "Use Native File Picker", &main.conf.useNativeFilePicker);
+                            checkbox_boolean_field(gui, "update notifications enable", "Check For Updates On Startup", &main.conf.checkForUpdates);
                         #endif
                         slider_scalar_field(gui, "drag zoom slider", "Drag zoom speed", &main.conf.dragZoomSpeed, 0.0, 1.0, {.decimalPrecision = 3});
                         slider_scalar_field(gui, "scroll zoom slider", "Scroll zoom speed", &main.conf.scrollZoomSpeed, 0.0, 1.0, {.decimalPrecision = 3});
-                        checkbox_boolean_field(gui, "flip zoom tool direction", "Flip zoom tool direction", &main.conf.flipZoomToolDirection);
-                        checkbox_boolean_field(gui, "make all tools share same size", "Make all tools share size", &main.toolConfig.globalConf.useGlobalRelativeWidth);
-                        input_scalar_field(gui, "jump transition time", "Jump transition time", &main.conf.jumpTransitionTime, 0.01f, 1000.0f, {.decimalPrecision = 2});
+                        checkbox_boolean_field(gui, "flip zoom tool direction", "Flip Zoom Tool Direction", &main.conf.flipZoomToolDirection);
+                        checkbox_boolean_field(gui, "make all tools share same size", "Make All Tools Share Size", &main.toolConfig.globalConf.useGlobalRelativeWidth);
+                        input_scalar_field(gui, "jump transition time", "Jump Transition Time", &main.conf.jumpTransitionTime, 0.01f, 1000.0f, {.decimalPrecision = 2});
 
-                        checkbox_boolean_field(gui, "real time eraser", "Eraser works in real time", &main.conf.realTimeEraser);
-                        checkbox_boolean_field(gui, "disable touch for drawing", "Disable touch for drawing", &main.conf.disableTouchForDrawing);
+                        checkbox_boolean_field(gui, "real time eraser", "Eraser Works In Real Time", &main.conf.realTimeEraser);
+                        checkbox_boolean_field(gui, "disable touch for drawing", "Disable Touch For Drawing", &main.conf.disableTouchForDrawing);
                         checkbox_boolean_field(gui, "force extension on path", "Force extension on path when saving files", &main.conf.forceExtensionOnPath);
                         #ifdef ADD_PREFER_X11_OPTION
-                            checkbox_boolean_field(gui, "prefer x11", "Prefer X11 over Wayland (Requires restart)", &main.conf.preferX11);
+                            checkbox_boolean_field(gui, "prefer x11", "Prefer X11 Over Wayland (Requires Restart)", &main.conf.preferX11);
                         #endif
                     });
                     break;
@@ -1530,7 +1530,7 @@ void Toolbar::general_settings_inner_gui() {
                             .decimalPrecision = 1,
                             .onEdit = [&] { main.g.window_update(); }
                         });
-                        text_label(gui, "Anti-aliasing:");
+                        text_label(gui, "Anti-Aliasing:");
                         radio_button_selector(gui, "Antialiasing selector", &main.conf.antialiasing, {
                             {"None", GlobalConfig::AntiAliasing::NONE},
                             {"Skia", GlobalConfig::AntiAliasing::SKIA},
@@ -1554,23 +1554,23 @@ void Toolbar::general_settings_inner_gui() {
                         input_scalar_field<unsigned>(gui, "Background FPS cap", "Background FPS Cap", &main.conf.mainCallbackRateBackground, 1, 100000);
                         #ifndef __EMSCRIPTEN__
                             checkbox_boolean_field(gui, "disable graphics driver workarounds", "Disable graphics driver workarounds (enabling or disabling this might fix some graphical glitches, requires restart)", &main.conf.disableGraphicsDriverWorkarounds);
-                            checkbox_boolean_field(gui, "apply display scale", "Apply display scale", &main.conf.applyDisplayScale);
+                            checkbox_boolean_field(gui, "apply display scale", "Apply Display Scale", &main.conf.applyDisplayScale);
                         #endif
                     });
                     break;
                 }
                 case GSETTINGS_TABLET: {
                     general_scroll_area("tablet settings", [&] {
-                        checkbox_boolean_field(gui, "pen pressure width", "Pen pressure affects brush size", &main.conf.tabletOptions.pressureAffectsBrushWidth);
-                        input_scalar_field<uint8_t>(gui, "middle click", "Middle click pen button", &main.conf.tabletOptions.middleClickButton, 1, 255);
-                        input_scalar_field<uint8_t>(gui, "right click", "Right click pen button", &main.conf.tabletOptions.rightClickButton, 1, 255);
+                        checkbox_boolean_field(gui, "pen pressure width", "Pen Pressure Affects Brush Size", &main.conf.tabletOptions.pressureAffectsBrushWidth);
+                        input_scalar_field<uint8_t>(gui, "middle click", "Middle Click Pen Button", &main.conf.tabletOptions.middleClickButton, 1, 255);
+                        input_scalar_field<uint8_t>(gui, "right click", "Right Click Pen Button", &main.conf.tabletOptions.rightClickButton, 1, 255);
                         slider_scalar_field(gui, "tablet brush minimum size", "Brush relative minimum size", &main.conf.tabletOptions.brushMinimumSize, 0.0f, 1.0f, {.decimalPrecision = 3});
                         slider_scalar_field(gui, "tablet brush pressure smoothing factor", "Brush pressure smoothing factor", &main.conf.tabletOptions.brushPressureSmoothingFactor, 0.0f, 1.0f, {.decimalPrecision = 3});
                         checkbox_boolean_field(gui, "tablet zoom with button method", "Zoom when pen touching tablet and pen button assigned to middle click is held", &main.conf.tabletOptions.zoomWhilePenDownAndButtonHeld);
                         #ifdef _WIN32
                             checkbox_boolean_field(gui, "mouse ignore when pen proximity", "Ignore mouse movement when pen in proximity", &main.conf.tabletOptions.ignoreMouseMovementWhenPenInProximity);
                         #endif
-                        checkbox_boolean_field(gui, "disable touch when pen in proximity", "Disable touch when pen in proximity", &main.conf.tabletOptions.disableTouchWhenPenInProximity);
+                        checkbox_boolean_field(gui, "disable touch when pen in proximity", "Disable Touch When Pen In Proximity", &main.conf.tabletOptions.disableTouchWhenPenInProximity);
                     });
                     break;
                 }
@@ -1618,7 +1618,7 @@ void Toolbar::general_settings_inner_gui() {
                             }
                         });
                         if(themeData.openedSaveAsMenu) {
-                            input_text_field(gui, "Theme name:", "Theme name: ", &main.conf.themeCurrentlyLoaded);
+                            input_text_field(gui, "Theme name:", "Theme Name: ", &main.conf.themeCurrentlyLoaded);
                             left_to_right_line_layout(gui, [&]() {
                                 text_button_wide("saveasdone", "Done", [&] {
                                     main.g.save_theme(main.conf.configPath, main.conf.themeCurrentlyLoaded);
@@ -1629,7 +1629,7 @@ void Toolbar::general_settings_inner_gui() {
                                 });
                             });
                         }
-                        text_label(gui, "Edit theme:");
+                        text_label(gui, "Edit Theme:");
                         text_label_light(gui, "Note: Changes only remain if theme is saved");
                         auto theme_color_field = [&](const char* id, const char* name, SkColor4f* c) {
                             color_picker_button_field<SkColor4f>(gui, id, name, c, {});
@@ -1645,8 +1645,8 @@ void Toolbar::general_settings_inner_gui() {
                         theme_color_field("warningColor", "Warning Color", &io.theme->warningColor);
                         theme_color_field("errorColor", "Error Color", &io.theme->errorColor);
                         //gui.slider_scalar_field("hoverExpandTime", "Hover Expand Time", &io.theme->hoverExpandTime, 0.001f, 1.0f);
-                        input_scalar_field<uint16_t>(gui, "childGap1", "Gap between child elements", &io.theme->childGap1, 0, 30);
-                        input_scalar_field<uint16_t>(gui, "padding1", "Window padding", &io.theme->padding1, 0, 30);
+                        input_scalar_field<uint16_t>(gui, "childGap1", "Gap Between Child Elements", &io.theme->childGap1, 0, 30);
+                        input_scalar_field<uint16_t>(gui, "padding1", "Window Padding", &io.theme->padding1, 0, 30);
                         slider_scalar_field<float>(gui, "windowCorners1", "Window corner radius", &io.theme->windowCorners1, 0, 30);
                     });
                     break;
@@ -1685,19 +1685,19 @@ void Toolbar::general_settings_inner_gui() {
                 case GSETTINGS_DEBUG: {
                     general_scroll_area("debug settings menu", [&] {
                         #ifndef __EMSCRIPTEN__
-                            checkbox_boolean_field(gui, "use mobile UI", "Use mobile UI (requires restart)", &main.conf.mobileUI);
+                            checkbox_boolean_field(gui, "use mobile UI", "Use Mobile UI (Requires Restart)", &main.conf.mobileUI);
                         #endif
-                        input_scalars_field(gui, "jump transition easing", "Jump easing", &main.conf.jumpTransitionEasing, 4, -10.0f, 10.0f, { .decimalPrecision = 2 });
-                        input_scalar_field<int>(gui, "image load max threads", "Maximum image loading threads", &ImageResourceDisplay::IMAGE_LOAD_THREAD_COUNT_MAX, 1, 10000);
-                        text_label_light(gui, "Cache related settings");
-                        input_scalar_field<size_t>(gui, "cache node resolution", "Cache node resolution", &DrawingProgramCache::CACHE_NODE_RESOLUTION, 256, 8192);
-                        input_scalar_field<size_t>(gui, "max cache nodes", "Maximum cached nodes", &DrawingProgramCache::MAXIMUM_DRAW_CACHE_SURFACES, 2, 10000);
+                        input_scalars_field(gui, "jump transition easing", "Jump Easing", &main.conf.jumpTransitionEasing, 4, -10.0f, 10.0f, { .decimalPrecision = 2 });
+                        input_scalar_field<int>(gui, "image load max threads", "Maximum Image Loading Threads", &ImageResourceDisplay::IMAGE_LOAD_THREAD_COUNT_MAX, 1, 10000);
+                        text_label_light(gui, "Cache Related Settings");
+                        input_scalar_field<size_t>(gui, "cache node resolution", "Cache Node Resolution", &DrawingProgramCache::CACHE_NODE_RESOLUTION, 256, 8192);
+                        input_scalar_field<size_t>(gui, "max cache nodes", "Maximum Cached Nodes", &DrawingProgramCache::MAXIMUM_DRAW_CACHE_SURFACES, 2, 10000);
                         size_t cacheVRAMConsumptionInMB =  ( DrawingProgramCache::MAXIMUM_DRAW_CACHE_SURFACES // Number of surfaces
                                                            * DrawingProgramCache::CACHE_NODE_RESOLUTION * DrawingProgramCache::CACHE_NODE_RESOLUTION // Number of pixels per cache surface
                                                            * 4) // 4 Channels per pixel (RGBA)
                                                            / (1024 * 1024); // Bytes -> Megabytes conversion
-                        text_label_light(gui, "Cache max VRAM consumption (MB): " + std::to_string(cacheVRAMConsumptionInMB));
-                        input_scalar_field<size_t>(gui, "max components in node", "Maximum components in single node", &DrawingProgramCache::MAXIMUM_COMPONENTS_IN_SINGLE_NODE, 2, 10000);
+                        text_label_light(gui, "Cache Max VRAM Consumption (MB): " + std::to_string(cacheVRAMConsumptionInMB));
+                        input_scalar_field<size_t>(gui, "max components in node", "Maximum Components In Single Node", &DrawingProgramCache::MAXIMUM_COMPONENTS_IN_SINGLE_NODE, 2, 10000);
                         input_scalar_field<size_t>(gui, "components to force cache rebuild", "Number of components to force cache rebuild", &DrawingProgramCache::MINIMUM_COMPONENTS_TO_START_REBUILD, 1, 1000000);
                         input_scalar_field<size_t>(gui, "maximum frame time to force cache rebuild", "Maximum frame time to force cache rebuild (ms)", &DrawingProgramCache::MILLISECOND_FRAME_TIME_TO_FORCE_CACHE_REFRESH, 1, 1000000);
                         input_scalar_field<size_t>(gui, "minimum time to force cache rebuild", "Minimum time to check cache rebuild (ms)", &DrawingProgramCache::MILLISECOND_MINIMUM_TIME_TO_CHECK_FORCE_REFRESH, 1, 1000000);

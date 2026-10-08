@@ -48,9 +48,9 @@ void EllipseDrawTool::gui_toolbox(Toolbar& t) {
     gui.new_id("ellipse draw tool", [&] {
         text_label_centered(gui, "Draw Ellipse");
         radio_button_selector(gui, "fill type", &fillStrokeMode, {
-            {"Fill only", 0},
-            {"Outline only", 1},
-            {"Fill and Outline", 2}
+            {"Fill Only", 0},
+            {"Outline Only", 1},
+            {"Fill And Outline", 2}
         });
         if(fillStrokeMode == 1 || fillStrokeMode == 2)
             toolConfig.relative_width_gui(drawP, "Outline Size");
@@ -66,9 +66,9 @@ void EllipseDrawTool::gui_phone_toolbox(PhoneDrawingProgramScreen& t) {
     auto& fillStrokeMode = toolConfig.ellipseDraw.fillStrokeMode;
     gui.new_id("ellipse draw tool", [&] {
         radio_button_selector(gui, "fill type", &fillStrokeMode, {
-            {"Fill only", 0},
-            {"Outline only", 1},
-            {"Fill and Outline", 2}
+            {"Fill Only", 0},
+            {"Outline Only", 1},
+            {"Fill And Outline", 2}
         });
         if(fillStrokeMode == 1 || fillStrokeMode == 2)
             toolConfig.relative_width_gui(drawP, "Outline Size");

@@ -37,7 +37,7 @@ DrawingProgramToolType PanCanvasTool::get_type() {
 void PanCanvasTool::gui_toolbox(Toolbar& t) {
     auto& gui = drawP.world.main.g.gui;
     gui.new_id("Pan canvas tool", [&] {
-        GUIStuff::ElementHelpers::text_label_centered(gui, "Pan tool");
+        GUIStuff::ElementHelpers::text_label_centered(gui, "Pan Tool");
     });
 }
 
@@ -58,7 +58,7 @@ void PanCanvasTool::input_finger_touch_on_canvas_callback(const FingerInput::Tou
 void PanCanvasTool::gui_phone_toolbox(PhoneDrawingProgramScreen& t) {
     auto& gui = drawP.world.main.g.gui;
     gui.new_id("Pan canvas tool", [&] {
-        GUIStuff::ElementHelpers::text_label_centered(gui, "Pan tool");
+        GUIStuff::ElementHelpers::text_label_centered(gui, "Pan Tool");
     });
 }
 

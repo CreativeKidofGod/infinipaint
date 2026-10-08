@@ -48,9 +48,9 @@ void RectDrawTool::gui_toolbox(Toolbar& t) {
         text_label_centered(gui, "Draw Rectangle");
         slider_scalar_field(gui, "relradiuswidth", "Corner Radius", &relativeRadiusWidth, 0.0f, 40.0f);
         radio_button_selector(gui, "fill type", &fillStrokeMode, {
-            {"Fill only", 0},
-            {"Outline only", 1},
-            {"Fill and Outline", 2}
+            {"Fill Only", 0},
+            {"Outline Only", 1},
+            {"Fill And Outline", 2}
         });
         if(fillStrokeMode == 1 || fillStrokeMode == 2)
             toolConfig.relative_width_gui(drawP, "Outline Size");
@@ -68,9 +68,9 @@ void RectDrawTool::gui_phone_toolbox(PhoneDrawingProgramScreen& t) {
     gui.new_id("rect draw tool", [&] {
         slider_scalar_field(gui, "relradiuswidth", "Corner Radius", &relativeRadiusWidth, 0.0f, 40.0f);
         radio_button_selector(gui, "fill type", &fillStrokeMode, {
-            {"Fill only", 0},
-            {"Outline only", 1},
-            {"Fill and Outline", 2}
+            {"Fill Only", 0},
+            {"Outline Only", 1},
+            {"Fill And Outline", 2}
         });
         if(fillStrokeMode == 1 || fillStrokeMode == 2)
             toolConfig.relative_width_gui(drawP, "Outline Size");
