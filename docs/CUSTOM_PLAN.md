@@ -156,6 +156,13 @@ choices stay true to what Levi asked for.
     - A "fit to screen" button instead of true fullscreen.
     - WARNING: large file sizes.
 
+## Ideas noted for later (not scheduled yet)
+
+- **Copy out of InfiniPaint (Levi, 2026-10-12):** select an image (or PDF snip), copy it, and paste it into
+  another app or text box outside InfiniPaint (Word, Docs, chat, email). Put it on the Windows clipboard as a
+  normal image. Fits with Phase 4 (snip tool) or Phase 5 (export).
+- Levi's interests outside this app (just holding, no action): HandBrake, Ollama / LM Studio.
+
 ## Before trusting a phase
 
 - Test with a big, realistic canvas: lots of strokes, several PDFs, and images.

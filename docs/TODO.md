@@ -22,7 +22,7 @@ unchecked item in each update until Levi confirms it.
 
 ## Phase 1b (layer kinds)
 
-- [ ] Download the layer-kinds build and test it (checklist in chat).
+- [ ] When ready: download build -10 (layer kinds) and test it (6-step checklist in chat). Link: https://github.com/CreativeKidofGod/infinipaint/actions/runs/37770207026/artifacts/11547652630 (expires 2026-11-07).
 
 ## Standing reminders
 
