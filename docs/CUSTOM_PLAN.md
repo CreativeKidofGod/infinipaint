@@ -78,7 +78,8 @@ choices stay true to what Levi asked for.
 - "Are you sure?" and Move To only cover the four locked layers. Layers Levi makes have no Move To button yet.
 - Build: one zip instead of a zip in a zip, newer GitHub build tools, and tags starting with "v" publish a Release that never expires.
 
-## Phase 1b: layer kinds (replaces the "core four" rules, Levi approved 2026-10-08)
+## Phase 1b: layer kinds (built as -10, UNTESTED. 2026-10-13: Levi leaning toward dropping it and keeping the
+## original four-layer system from -9, optimizing later only if needed. Waiting for his yes before reverting.)
 
 - **Every layer has a kind: Any, Pictures or Writing.** Stored on the layer, so renaming keeps it.
   Why: simpler and uniform. No special layers, no on/off switch. Setting layers to Any = opting out.
@@ -161,6 +162,12 @@ choices stay true to what Levi asked for.
 - **Copy out of InfiniPaint (Levi, 2026-10-12):** select an image (or PDF snip), copy it, and paste it into
   another app or text box outside InfiniPaint (Word, Docs, chat, email). Put it on the Windows clipboard as a
   normal image. Fits with Phase 4 (snip tool) or Phase 5 (export).
+- **Right-click "Copy As Image" / "Copy As PDF" (Levi, 2026-10-13)** for anything selected with the lasso or Edit tool:
+  - Drawings/shapes: image = snapshot, PDF = vector. Text box: image option copies the text itself, PDF = vector text.
+    Image: original picture / picture in a PDF. PDF (after Phase 4): rendered part / real vector part.
+    Video (Phase 10): current frame for both. Mixed selection: one image / one PDF of everything.
+  - Most apps can't paste a PDF into a text box, so "Copy As PDF" puts a PDF *file* on the clipboard
+    (paste into email, chat or a folder). "Copy As Image" pastes almost anywhere.
 - Levi's interests outside this app (just holding, no action): HandBrake, Ollama / LM Studio.
 
 ## Before trusting a phase
