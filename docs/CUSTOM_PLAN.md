@@ -165,7 +165,8 @@ choices stay true to what Levi asked for.
 - **Right-click "Copy As Image" / "Copy As PDF" (Levi, 2026-10-13)** for anything selected with the lasso or Edit tool:
   - Drawings/shapes: image = snapshot, PDF = vector. Text box: image option copies the text itself, PDF = vector text.
     Image: original picture / picture in a PDF. PDF (after Phase 4): rendered part / real vector part.
-    Video (Phase 10): current frame for both. Mixed selection: one image / one PDF of everything.
+    Video (Phase 10): add a third option, "Copy Video", that puts the video *file* on the clipboard
+    (Levi, 2026-10-13); Copy As Image / PDF give the current frame. Mixed selection: one image / one PDF of everything.
   - Most apps can't paste a PDF into a text box, so "Copy As PDF" puts a PDF *file* on the clipboard
     (paste into email, chat or a folder). "Copy As Image" pastes almost anywhere.
 - Levi's interests outside this app (just holding, no action): HandBrake, Ollama / LM Studio.
