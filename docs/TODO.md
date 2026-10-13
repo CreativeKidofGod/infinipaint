@@ -20,9 +20,9 @@ unchecked item in each update until Levi confirms it.
 - [x] Build -9: everything works (2026-10-08). Phase 1 done.
 - [ ] Keep the -9 folder (its download link expires 2026-11-07). Delete -6, -7, -8 after checking no drawings are inside.
 
-## Phase 1b (layer kinds)
+## Phase 1c (-9 plus extras)
 
-- [ ] When ready: download build -10 (layer kinds) and test it (6-step checklist in chat). Link: https://github.com/CreativeKidofGod/infinipaint/actions/runs/37770207026/artifacts/11547652630 (expires 2026-11-07).
+- [ ] When ready: download the new build and test it (checklist in chat). Skip -10, it was dropped.
 
 ## Standing reminders
 
@@ -31,8 +31,6 @@ unchecked item in each update until Levi confirms it.
   without moving canvases out first. (Phase 2 fixes this.)
 - Keep canvases outside OneDrive. Documents and Desktop on this PC sync to
   OneDrive, so don't save canvases there.
-- Canvases saved with the custom app (from the layer-kinds build on) won't open in
-  official InfiniPaint. They still open in the custom app.
 - The official InfiniPaint is also installed. Double-clicking a canvas opens
   the official app, not the custom one. Open canvases from inside the custom
   app. (Phase 2 should handle this.)

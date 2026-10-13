@@ -31,6 +31,9 @@ class DrawingProgramLayerManagerGUI {
         DrawingProgramLayerManagerGUI(DrawingProgramLayerManager& layerManager);
         void refresh_gui_data();
         void setup_list_gui();
+        // Custom fork: short explanation of the four-layer rules (layer panel "?" and About > Custom Features)
+        static void layer_rules_help_gui(GUIStuff::GUIManager& gui);
+        static void custom_features_help_gui(GUIStuff::GUIManager& gui);
     private:
         std::optional<std::pair<NetworkingObjects::NetObjID, NetworkingObjects::NetObjOrderedListIterator<DrawingProgramLayerListItem>>> try_to_create_in_proper_position(DrawingProgramLayerListItem* newItem);
         std::pair<NetworkingObjects::NetObjID, NetworkingObjects::NetObjOrderedListIterator<DrawingProgramLayerListItem>> create_in_proper_position(DrawingProgramLayerListItem* newItem);
@@ -45,8 +48,7 @@ class DrawingProgramLayerManagerGUI {
         std::string nameForNew;
         float alphaValToEdit = 0.0f;
         size_t blendModeValToEdit = 0;
-        size_t kindValToEdit = 0;
-        bool showKindHelp = false;
+        bool showLayerHelp = false;
 
         std::set<GUIStuff::TreeListingObjIndexList> selectedLayerIndices;
         NetworkingObjects::NetObjWeakPtr<DrawingProgramLayerListItem> editingLayer;

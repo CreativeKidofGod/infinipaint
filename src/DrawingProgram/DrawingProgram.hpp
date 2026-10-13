@@ -89,7 +89,7 @@ class DrawingProgram {
         // Moves the selection to a layer, but first asks "Are you sure?" when lines, shapes or text
         // would leave the Writing layer. guiPos is where the question appears.
         void request_move_selection_to_layer(DrawingProgramLayerListItem* layer, Vector2f guiPos);
-        // One button per layer (top to bottom) with its name, kind and "(Current)"
+        // One button per layer (top to bottom) with its name and "(Current)"
         std::string layer_choice_label(DrawingProgramLayerListItem* layer);
         void layer_choice_buttons(const std::function<void(DrawingProgramLayerListItem*)>& onPick);
         void input_paste_callback(const CustomEvents::PasteEvent& paste);
@@ -192,6 +192,7 @@ class DrawingProgram {
         DrawingProgramLayerListItem* pendingMoveConfirmLayer = nullptr;
         bool pendingMoveConfirmIsImages = false;
         DrawingProgramLayerListItem* pendingInsertConfirmLayer = nullptr;
+        static bool is_writing_or_calendar(DrawingProgramLayerManager& layerMan, DrawingProgramLayerListItem* layer);
         Vector2f pendingMoveConfirmPos = {0.0f, 0.0f};
         void move_confirm_popup_gui();
 

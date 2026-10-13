@@ -36,6 +36,7 @@
 #include "RichText/TextStyleModifier.hpp"
 #include "VersionConstants.hpp"
 #include "World.hpp"
+#include "DrawingProgram/Layers/DrawingProgramLayerManagerGUI.hpp"
 #include <SDL3/SDL_dialog.h>
 #include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_render.h>
@@ -1748,6 +1749,19 @@ void Toolbar::about_menu_inner_gui() {
                                 .onClick = [&] { selectedLicense = -1; }
                             });
                         }
+                        CLAY_AUTO_ID({
+                            .layout = {
+                                .sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIT(0)}
+                            }
+                        }) {
+                            text_button(gui, "customfeaturesbutton", "Custom Features", {
+                                .drawType = SelectableButton::DrawType::TRANSPARENT_ALL,
+                                .isSelected = selectedLicense == -2,
+                                .wide = true,
+                                .centered = false,
+                                .onClick = [&] { selectedLicense = -2; }
+                            });
+                        }
                         text_label_light_centered(gui, "Third Party Components");
                         for(int i = 0; i < static_cast<int>(main.conf.thirdPartyLicenses.size()); i++) {
                             CLAY_AUTO_ID({
@@ -1777,7 +1791,10 @@ void Toolbar::about_menu_inner_gui() {
             .clipVertical = true,
             .scrollbarY = ScrollArea::ScrollbarType::NORMAL,
             .innerContent = [&](const ScrollArea::InnerContentParameters&) {
-                text_label_size(gui, (selectedLicense == -1) ? main.conf.ownLicenseText : main.conf.thirdPartyLicenses[selectedLicense].second, 0.8f);
+                if(selectedLicense == -2)
+                    DrawingProgramLayerManagerGUI::custom_features_help_gui(gui);
+                else
+                    text_label_size(gui, (selectedLicense == -1) ? main.conf.ownLicenseText : main.conf.thirdPartyLicenses[selectedLicense].second, 0.8f);
             }
         });
     });

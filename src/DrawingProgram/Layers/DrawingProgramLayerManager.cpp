@@ -36,72 +36,87 @@ DrawingProgramLayerManager::DrawingProgramLayerManager(DrawingProgram& drawProg)
 void DrawingProgramLayerManager::server_init_no_file() {
     layerTreeRoot = drawP.world.netObjMan.make_obj_from_ptr<DrawingProgramLayerListItem>(new DrawingProgramLayerListItem(drawP.world.netObjMan, "ROOT", true));
     layerTreeRoot->get_folder().set_component_list_callbacks(*this); // Only need to call set_component_list_callbacks on root, and the rest will get the callbacks set as well
-    add_default_layers();
-    switch_editing_layer_to(find_top_layer_of_kind(LayerKind::WRITING));
+    add_missing_locked_layers();
+    switch_editing_layer_to(find_locked_layer(LockedLayerType::WRITING));
 }
 
-void DrawingProgramLayerManager::add_default_layers() {
-    // Top to bottom. Calendar is a plain layer until the live calendar exists.
-    auto& folderList = layerTreeRoot->get_folder().folderList;
-    auto insertIt = folderList->begin();
-    folderList->emplace_direct(folderList, insertIt, drawP.world.netObjMan, "Writing", false, LayerKind::WRITING);
-    folderList->emplace_direct(folderList, insertIt, drawP.world.netObjMan, "Calendar", false, LayerKind::ANY);
-    folderList->emplace_direct(folderList, insertIt, drawP.world.netObjMan, "Overlay", false, LayerKind::PICTURES);
-    folderList->emplace_direct(folderList, insertIt, drawP.world.netObjMan, "Base", false, LayerKind::PICTURES);
+const char* DrawingProgramLayerManager::locked_layer_name(LockedLayerType type) {
+    switch(type) {
+        case LockedLayerType::BASE: return "Base";
+        case LockedLayerType::OVERLAY: return "Overlay";
+        case LockedLayerType::CALENDAR: return "Calendar";
+        case LockedLayerType::WRITING: return "Writing";
+        case LockedLayerType::NONE: break;
+    }
+    return "";
 }
 
-void DrawingProgramLayerManager::give_old_canvas_layer_kinds() {
-    // Canvases saved before layer kinds existed (official InfiniPaint, or custom builds up to -9).
-    // Custom builds named their layers Base/Overlay/Calendar/Writing, so turn those names into kinds.
-    // Canvases without any of them get the four default layers added on top, like a new canvas.
-    bool foundNamedLayer = false;
+DrawingProgramLayerManager::LockedLayerType DrawingProgramLayerManager::get_locked_layer_type(const DrawingProgramLayerListItem* layer) const {
+    if(!layer || layer->is_folder() || !layerTreeRoot)
+        return LockedLayerType::NONE;
+    // Only layers directly in the top level count, so layers with the same name inside folders stay normal
+    bool isTopLevel = false;
     for(auto& c : *layerTreeRoot->get_folder().folderList) {
-        if(c.obj->is_folder())
-            continue;
-        const std::string& name = c.obj->get_name();
-        if(name == "Base" || name == "Overlay")
-            c.obj->set_kind(*this, LayerKind::PICTURES);
-        else if(name == "Writing")
-            c.obj->set_kind(*this, LayerKind::WRITING);
-        else if(name != "Calendar")
-            continue;
-        foundNamedLayer = true;
+        if(c.obj.get() == layer) {
+            isTopLevel = true;
+            break;
+        }
     }
-    if(!foundNamedLayer)
-        add_default_layers();
-}
-
-LayerKind DrawingProgramLayerManager::kind_for_component(CanvasComponentType type) {
-    return type == CanvasComponentType::IMAGE ? LayerKind::PICTURES : LayerKind::WRITING;
-}
-
-const char* DrawingProgramLayerManager::layer_kind_name(LayerKind kind) {
-    switch(kind) {
-        case LayerKind::PICTURES: return "Pictures";
-        case LayerKind::WRITING: return "Writing";
-        case LayerKind::ANY: break;
+    if(!isTopLevel)
+        return LockedLayerType::NONE;
+    for(LockedLayerType type : LOCKED_LAYERS_TOP_TO_BOTTOM) {
+        if(layer->get_name() == locked_layer_name(type))
+            return type;
     }
-    return "Any";
+    return LockedLayerType::NONE;
 }
 
-DrawingProgramLayerListItem* DrawingProgramLayerManager::find_top_layer_of_kind(LayerKind kind) {
-    if(!layerTreeRoot)
+DrawingProgramLayerListItem* DrawingProgramLayerManager::find_locked_layer(LockedLayerType type) const {
+    if(type == LockedLayerType::NONE || !layerTreeRoot)
         return nullptr;
-    for(DrawingProgramLayerListItem* l : get_flattened_layer_list()) { // Top first
-        if(l->get_kind() == kind)
-            return l;
+    for(auto& c : *layerTreeRoot->get_folder().folderList) {
+        if(!c.obj->is_folder() && c.obj->get_name() == locked_layer_name(type))
+            return c.obj.get();
     }
     return nullptr;
 }
 
-bool DrawingProgramLayerManager::layer_exists(DrawingProgramLayerListItem* layer) {
-    if(!layer || !layerTreeRoot)
-        return false;
-    auto allLayers = get_flattened_layer_list();
-    return std::find(allLayers.begin(), allLayers.end(), layer) != allLayers.end();
+void DrawingProgramLayerManager::add_missing_locked_layers() {
+    auto& folderList = layerTreeRoot->get_folder().folderList;
+    for(size_t i = 0; i < LOCKED_LAYERS_TOP_TO_BOTTOM.size(); i++) {
+        LockedLayerType type = LOCKED_LAYERS_TOP_TO_BOTTOM[i];
+        if(find_locked_layer(type))
+            continue;
+        // Keep the order Writing > Calendar > Overlay > Base: go directly above the closest
+        // existing locked layer below this one, or else directly below the closest one above it
+        auto insertIt = folderList->begin();
+        bool found = false;
+        for(size_t j = i + 1; j < LOCKED_LAYERS_TOP_TO_BOTTOM.size() && !found; j++) {
+            DrawingProgramLayerListItem* below = find_locked_layer(LOCKED_LAYERS_TOP_TO_BOTTOM[j]);
+            for(auto it = folderList->begin(); below && it != folderList->end(); ++it) {
+                if(it->obj.get() == below) {
+                    insertIt = it;
+                    found = true;
+                    break;
+                }
+            }
+        }
+        for(size_t j = i; j > 0 && !found; j--) {
+            DrawingProgramLayerListItem* above = find_locked_layer(LOCKED_LAYERS_TOP_TO_BOTTOM[j - 1]);
+            for(auto it = folderList->begin(); above && it != folderList->end(); ++it) {
+                if(it->obj.get() == above) {
+                    insertIt = std::next(it);
+                    found = true;
+                    break;
+                }
+            }
+        }
+        folderList->emplace_direct(folderList, insertIt, drawP.world.netObjMan, locked_layer_name(type), false);
+    }
 }
 
 void DrawingProgramLayerManager::switch_editing_layer_to(DrawingProgramLayerListItem* layer) {
+    // Works for any layer, including ones inside folders
     if(!layer || layer->is_folder() || editingLayer.lock().get() == layer)
         return;
     std::function<bool(DrawingProgramLayerListItem&)> searchFolder = [&](DrawingProgramLayerListItem& folder) {
@@ -119,16 +134,27 @@ void DrawingProgramLayerManager::switch_editing_layer_to(DrawingProgramLayerList
     searchFolder(*layerTreeRoot);
 }
 
+bool DrawingProgramLayerManager::layer_exists(DrawingProgramLayerListItem* layer) {
+    if(!layer || !layerTreeRoot)
+        return false;
+    auto allLayers = get_flattened_layer_list();
+    return std::find(allLayers.begin(), allLayers.end(), layer) != allLayers.end();
+}
+
 DrawingProgramLayerListItem* DrawingProgramLayerManager::get_editing_layer() {
     return editingLayer.lock().get();
 }
 
 DrawingProgramLayerListItem* DrawingProgramLayerManager::get_routed_layer(DrawingProgramLayerListItem* editLayer, CanvasComponentType compType) {
-    LayerKind editKind = editLayer->get_kind();
-    LayerKind compKind = kind_for_component(compType);
-    if(editKind == LayerKind::ANY || editKind == compKind)
-        return editLayer;
-    DrawingProgramLayerListItem* target = find_top_layer_of_kind(compKind);
+    LockedLayerType editType = get_locked_layer_type(editLayer);
+    if(editType == LockedLayerType::NONE)
+        return editLayer; // Layers the user made themselves are never redirected
+    LockedLayerType targetType;
+    if(compType == CanvasComponentType::IMAGE)
+        targetType = (editType == LockedLayerType::BASE) ? LockedLayerType::BASE : LockedLayerType::OVERLAY;
+    else
+        targetType = LockedLayerType::WRITING;
+    DrawingProgramLayerListItem* target = find_locked_layer(targetType);
     return target ? target : editLayer;
 }
 
@@ -336,7 +362,7 @@ std::vector<CanvasComponentContainer::ObjInfoIterator> DrawingProgramLayerManage
         auto editLayerPtr = editingLayer.lock();
         if(!editLayerPtr)
             throw std::runtime_error("[DrawingProgramLayerManager::add_many_components_to_layer_being_edited] No layer selected!");
-        if(editLayerPtr->get_kind() == LayerKind::ANY) {
+        if(get_locked_layer_type(editLayerPtr.get()) == LockedLayerType::NONE) {
             auto toRet = editLayerPtr->get_layer().components->insert_sorted_list_and_send_create(editLayerPtr->get_layer().components, newObjs);
             add_undo_place_components(editLayerPtr.get(), toRet);
             return toRet;
@@ -428,8 +454,7 @@ void DrawingProgramLayerManager::load_file(cereal::PortableBinaryInputArchive& a
         comp->obj->commit_update_dont_invalidate_cache(drawP);
     });
     layerTreeRoot->erase_invalid_components();
-    if(version < VersionConstants::CUSTOM_LAYER_KIND_VERSION)
-        give_old_canvas_layer_kinds();
+    add_missing_locked_layers();
     drawP.rebuild_cache();
     editingLayer = layerTreeRoot->get_folder().get_initial_editing_layer();
 }
