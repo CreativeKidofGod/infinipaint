@@ -22,7 +22,7 @@ unchecked item in each update until Levi confirms it.
 
 ## Phase 1c (-9 plus extras)
 
-- [ ] When ready: download the new build and test it (checklist in chat). Skip -10, it was dropped.
+- [ ] When ready: download build -11 and test it (5-step checklist in chat). Skip -10, it was dropped. Link: https://github.com/CreativeKidofGod/infinipaint/actions/runs/38342098642/artifacts/11787686839 (expires 2026-11-12).
 
 ## Standing reminders
 
