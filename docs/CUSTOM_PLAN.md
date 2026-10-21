@@ -211,6 +211,16 @@ choices stay true to what Levi asked for.
     (Levi, 2026-10-13); Copy As Image / PDF give the current frame. Mixed selection: one image / one PDF of everything.
   - Most apps can't paste a PDF into a text box, so "Copy As PDF" puts a PDF *file* on the clipboard
     (paste into email, chat or a folder). "Copy As Image" pastes almost anywhere.
+- **Email + Docs/Slides/Sheets on the canvas (Levi asked 2026-10-21, idea only):**
+  - Realistic version: "snapshot cards". Emails from several accounts (Gmail, Outlook, iCloud, Yahoo) pulled in
+    read-only and placed as cards (sender, subject, text, attachments). Docs/Slides/Sheets and Word/PowerPoint/Excel
+    placed as sharp PDF pages (needs Phase 4 PDF import), each with an "Open Original" button to edit in Google /
+    Microsoft / Apple, and a "Refresh" button to update the snapshot.
+  - Not realistic: editing those files inside InfiniPaint and syncing changes back (that's rebuilding Word/Excel).
+  - Watch out: sign-in rules. Gmail access for an app sold to others needs Google's paid security review; Outlook.com
+    needs a (free) Microsoft app registration; iCloud/Yahoo use app passwords. Canvases would hold private email,
+    so storage and sharing must be careful. Personal-use-only is much simpler than a sold app.
+  - Size: like two or three phases. Best after Phase 4 (PDF) and Phase 6 (search).
 - Levi's interests outside this app (just holding, no action): HandBrake, Ollama / LM Studio.
 
 ## Before trusting a phase
