@@ -34,7 +34,7 @@ unchecked item in each update until Levi confirms it.
 
 ## Phase 2 (keeping work safe)
 
-- [ ] Test build -15 (checklist in chat).
+- [ ] Test build -15 (6-step checklist in chat). Link: https://github.com/CreativeKidofGod/infinipaint/actions/runs/39566341316/artifacts/12331242297 (expires 2026-11-20).
 
 ## Standing reminders
 
