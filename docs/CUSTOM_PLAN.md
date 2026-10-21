@@ -95,6 +95,14 @@ choices stay true to what Levi asked for.
 - Unchanged from -9: rules are tied to the names Base/Overlay/Calendar/Writing at the top level, so renaming or
   deleting one turns its rules off. Layers Levi adds are plain.
 
+## Fix 2026-10-21: opening a canvas no longer adds the four layers
+
+- Levi: canvases he made elsewhere (his "original", also used in official InfiniPaint) got Base/Overlay/Calendar/
+  Writing added on top when opened in the fork. Fork-only things must not change his other files.
+- Now only **new** canvases start with the four layers. Opened canvases keep exactly their own layers. Rules still
+  apply if a canvas has layers with those names. Build -12 (custom.8).
+- Rule for all future phases: the fork must never change a canvas just by opening it.
+
 ## Planned features (in order)
 
 1. **Layers**

@@ -41,6 +41,7 @@ DrawingProgramLayerManagerGUI::DrawingProgramLayerManagerGUI(DrawingProgramLayer
 void DrawingProgramLayerManagerGUI::layer_rules_help_gui(GUIStuff::GUIManager& gui) {
     using namespace GUIStuff::ElementHelpers;
     text_label_light(gui, "Your four layers");
+    text_label(gui, "New canvases start with Base, Overlay, Calendar and Writing. Canvases you open keep their own layers.");
     text_label(gui, "Base and Overlay: pictures and PDFs.");
     text_label(gui, "Calendar: the calendar (coming later).");
     text_label(gui, "Writing: lines, shapes and text.");

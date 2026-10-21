@@ -437,7 +437,10 @@ void DrawingProgramLayerManager::load_file(cereal::PortableBinaryInputArchive& a
         });
     }
     else {
-        server_init_no_file();
+        // Very old canvases (before layers existed) get one plain layer, like official InfiniPaint
+        layerTreeRoot = drawP.world.netObjMan.make_obj_from_ptr<DrawingProgramLayerListItem>(new DrawingProgramLayerListItem(drawP.world.netObjMan, "ROOT", true));
+        layerTreeRoot->get_folder().set_component_list_callbacks(*this);
+        editingLayer = layerTreeRoot->get_folder().folderList->emplace_back_direct(layerTreeRoot->get_folder().folderList, drawP.world.netObjMan, "First Layer", false)->obj;
         disable_add_to_cache_and_commit_update_block([&]() {
             CanvasComponentContainer::NetListTemporaryPtr editingLayerTmpPtrComponents = editingLayer.lock()->get_layer().components;
             uint64_t compCount;
@@ -454,7 +457,8 @@ void DrawingProgramLayerManager::load_file(cereal::PortableBinaryInputArchive& a
         comp->obj->commit_update_dont_invalidate_cache(drawP);
     });
     layerTreeRoot->erase_invalid_components();
-    add_missing_locked_layers();
+    // Custom fork: opening a canvas never adds the four layers. Only new canvases start with them,
+    // so canvases made elsewhere (e.g. official InfiniPaint) keep exactly their own layers.
     drawP.rebuild_cache();
     editingLayer = layerTreeRoot->get_folder().get_initial_editing_layer();
 }
