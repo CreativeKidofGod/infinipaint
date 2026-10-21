@@ -116,6 +116,19 @@ choices stay true to what Levi asked for.
   Settings, About and the close-popup already scrolled.
 - Rule for future features: any list that can grow must scroll (use scroll_list_layout).
 
+## Build maintenance (2026-10-21)
+
+- Builds 13 and 14 rebuilt Skia (~25 min) even though a cache was restored, and the cache was never re-saved.
+  Fixed: cache key ends in the run id (newest cache restored by prefix), saved only when Conan built something,
+  Conan pinned to 2.33.0. If Conan is ever upgraded, expect one slow build.
+- GitHub deletes caches unused for 7 days: weekly "Keep build cache warm" workflow restores it every Monday.
+  GitHub pauses scheduled workflows after 60 days without pushes, so after a break of 2+ months expect one slow
+  (~30 min) build. Nothing breaks, it's only slower.
+- Things that may need a quick update someday (not urgent): GitHub retiring the windows-2022 runner image
+  (switch to windows-2025), and old Node-based actions (ilammy/msvc-dev-cmd still uses Node 20).
+- Artifact downloads expire after 30 days; the copy on Levi's PC never does. For a permanent download of a good
+  build, push a tag like v0.6.1-custom.9 (publishes a GitHub Release, public).
+
 ## Planned features (in order)
 
 1. **Layers**

@@ -40,7 +40,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Conan
-        run: pip install "conan>=2.10,<3"
+        run: pip install "conan==2.33.0" # Pinned: a new Conan can make the saved Skia build unusable
 
       - name: Set up MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
@@ -73,6 +73,14 @@ jobs:
         shell: cmd
         run: call conan\export_libs.bat
 
+      - name: Measure Conan cache before install
+        id: cache-before
+        shell: pwsh
+        run: |
+          $size = 0
+          if (Test-Path C:\c2\p) { $size = (Get-ChildItem C:\c2\p -Recurse -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum }
+          "size=$size" >> $env:GITHUB_OUTPUT
+
       - name: Conan install (builds Skia on first run)
         shell: cmd
         run: >
@@ -82,10 +90,22 @@ jobs:
           -s build_type=Release
           --deployer=runtime_deploy --deployer-folder=%BUILD_DIR%\runtime
 
+      - name: Check whether Conan built anything
+        id: cache-after
+        if: always()
+        shell: pwsh
+        run: |
+          $size = 0
+          if (Test-Path C:\c2\p) { $size = (Get-ChildItem C:\c2\p -Recurse -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum }
+          $changed = "$size" -ne "${{ steps.cache-before.outputs.size }}"
+          Write-Host "Conan cache size before: ${{ steps.cache-before.outputs.size }}, after: $size, changed: $changed"
+          "changed=$($changed.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+
       # Save the cache even if a later step fails, so a failed compile of
       # InfiniPaint itself never throws away hours of dependency builds.
+      # Only saved when Conan actually built something, to avoid re-uploading gigabytes every run.
       - name: Save Conan cache
-        if: always() && steps.conan-cache.outputs.cache-hit != 'true'
+        if: always() && steps.cache-after.outputs.changed == 'true'
         uses: actions/cache/save@v6
         with:
           path: C:\c2\p
