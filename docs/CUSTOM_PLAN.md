@@ -107,6 +107,15 @@ choices stay true to what Levi asked for.
 - WATCH OUT for Phase 2: with autosave, opening an official canvas in the fork and making any edit will save the
   four added layers into that file within a minute. Levi accepted adding layers on open; remind him before Phase 2.
 
+## 2026-10-21: scroll bars for every growing list
+
+- Levi (build -13): with many layers, "Move Everything To" squished the layer list away and the buttons became thin bars.
+- Now: layer list and bookmark list have a fixed height (up to 8 rows, then they scroll). Layer edit options
+  (name, alpha, blend, Move Everything To, ? Layer Rules) scroll after 280px. Every "pick a layer" list (insert
+  question, right-click Move To, select tools' side panel) scrolls after 300px. The people list scrolls after 300px.
+  Settings, About and the close-popup already scrolled.
+- Rule for future features: any list that can grow must scroll (use scroll_list_layout).
+
 ## Planned features (in order)
 
 1. **Layers**

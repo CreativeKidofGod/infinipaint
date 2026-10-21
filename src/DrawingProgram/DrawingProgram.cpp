@@ -59,6 +59,7 @@
 #include "../GUIStuff/Elements/PositionAdjustingPopupMenu.hpp"
 #include "../GUIStuff/ElementHelpers/ButtonHelpers.hpp"
 #include "../GUIStuff/ElementHelpers/TextLabelHelpers.hpp"
+#include "../GUIStuff/ElementHelpers/LayoutHelpers.hpp"
 
 DrawingProgram::DrawingProgram(World& initWorld):
     world(initWorld),
@@ -841,14 +842,16 @@ void DrawingProgram::layer_choice_buttons(const std::function<void(DrawingProgra
     // One button per layer, top to bottom like the layer list. GUI IDs are matched by pointer,
     // so each button gets a numeric ID from its layer and a string literal inside.
     GUIStuff::GUIManager& gui = world.main.g.gui;
-    for(DrawingProgramLayerListItem* layer : layerMan.get_flattened_layer_list()) {
-        std::string text = layer_choice_label(layer);
-        gui.new_id(static_cast<int64_t>(reinterpret_cast<intptr_t>(layer)), [&] {
-            popup_menu_action_button("layer choice", text.c_str(), [onPick, layer] {
-                onPick(layer);
+    GUIStuff::ElementHelpers::scroll_list_layout(gui, "layer choice scroll", 300.0f, [&] { // Scrolls when there are many layers
+        for(DrawingProgramLayerListItem* layer : layerMan.get_flattened_layer_list()) {
+            std::string text = layer_choice_label(layer);
+            gui.new_id(static_cast<int64_t>(reinterpret_cast<intptr_t>(layer)), [&] {
+                popup_menu_action_button("layer choice", text.c_str(), [onPick, layer] {
+                    onPick(layer);
+                });
             });
-        });
-    }
+        }
+    });
 }
 
 void DrawingProgram::request_move_selection_to_layer(DrawingProgramLayerListItem* layer, Vector2f guiPos) {

@@ -26,6 +26,10 @@ void top_to_bottom_window_popup_layout(GUIManager& gui, const char* id, Clay_Siz
 void left_to_right_layout(GUIManager& gui, Clay_SizingAxis x, Clay_SizingAxis y, const std::function<void()>& innerContent);
 void left_to_right_line_layout(GUIManager& gui, const std::function<void()>& innerContent);
 void left_to_right_line_centered_layout(GUIManager& gui, const std::function<void()>& innerContent);
+// Custom fork: a list that grows with its content up to maxHeight, then gets a scroll bar
+void scroll_list_layout(GUIManager& gui, const char* id, float maxHeight, const std::function<void()>& innerContent);
+// Custom fork: a box of exactly this height (keeps lists like the layer list from being squished to nothing)
+void fixed_height_layout(GUIManager& gui, float height, const std::function<void()>& innerContent);
 
 struct WindowFillSideBarConfig {
     enum class Direction {

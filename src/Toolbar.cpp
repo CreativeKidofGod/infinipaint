@@ -1222,27 +1222,29 @@ void Toolbar::player_list() {
                     }) {}
                     text_label(gui, main.world->ownClientData->get_display_name());
                 });
-                size_t num = 0;
-                for(auto& client : main.world->clients->get_data()) {
-                    if(client != main.world->ownClientData) {
-                        gui.new_id(num++, [&] {
-                            left_to_right_line_layout(gui, [&]() {
-                                CLAY_AUTO_ID({
-                                    .layout = {
-                                        .sizing = {.width = CLAY_SIZING_FIXED(20), .height = CLAY_SIZING_FIXED(20)}
-                                    },
-                                    .backgroundColor = convert_vec4<Clay_Color>(SkColor4f{client->get_cursor_color().x(), client->get_cursor_color().y(), client->get_cursor_color().z(), 1.0f}),
-                                    .cornerRadius = CLAY_CORNER_RADIUS(3)
-                                }) {}
-                                text_label(gui, client->get_display_name());
-                                CLAY_AUTO_ID({.layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)}}}) {}
-                                text_button(gui, "teleport button", "Jump To", { .onClick = [&] {
-                                    main.world->drawData.cam.smooth_move_to(*main.world, client->get_cam_coords(), client->get_window_size());
-                                }});
+                scroll_list_layout(gui, "player list scroll", 300.0f, [&] { // Custom fork: scrolls with many people
+                    size_t num = 0;
+                    for(auto& client : main.world->clients->get_data()) {
+                        if(client != main.world->ownClientData) {
+                            gui.new_id(num++, [&] {
+                                left_to_right_line_layout(gui, [&]() {
+                                    CLAY_AUTO_ID({
+                                        .layout = {
+                                            .sizing = {.width = CLAY_SIZING_FIXED(20), .height = CLAY_SIZING_FIXED(20)}
+                                        },
+                                        .backgroundColor = convert_vec4<Clay_Color>(SkColor4f{client->get_cursor_color().x(), client->get_cursor_color().y(), client->get_cursor_color().z(), 1.0f}),
+                                        .cornerRadius = CLAY_CORNER_RADIUS(3)
+                                    }) {}
+                                    text_label(gui, client->get_display_name());
+                                    CLAY_AUTO_ID({.layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)}}}) {}
+                                    text_button(gui, "teleport button", "Jump To", { .onClick = [&] {
+                                        main.world->drawData.cam.smooth_move_to(*main.world, client->get_cam_coords(), client->get_window_size());
+                                    }});
+                                });
                             });
-                        });
+                        }
                     }
-                }
+                });
             }
             text_button(gui, "close list", "Done", { .wide = true, .onClick = [&] {
                 playerMenuOpen = false;

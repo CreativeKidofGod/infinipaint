@@ -20,6 +20,7 @@
 #include "../Elements/LayoutElement.hpp"
 #include "Helpers/ConvertVec.hpp"
 #include "../Elements/ManyElementScrollArea.hpp"
+#include "../Elements/ScrollArea.hpp"
 
 namespace GUIStuff { namespace ElementHelpers {
 
@@ -441,6 +442,42 @@ void attach_to_button_popup_layout(GUIManager& gui, const char* id, AttachToButt
             }
         }
     });
+}
+
+
+void scroll_list_layout(GUIManager& gui, const char* id, float maxHeight, const std::function<void()>& innerContent) {
+    CLAY_AUTO_ID({
+        .layout = {
+            .sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIT(0, maxHeight)}
+        }
+    }) {
+        gui.clipping_element<ScrollArea>(id, ScrollArea::Options{
+            .scrollVertical = true,
+            .clipVertical = true,
+            .scrollbarY = ScrollArea::ScrollbarType::NORMAL,
+            .innerContent = [&](const ScrollArea::InnerContentParameters&) {
+                CLAY_AUTO_ID({
+                    .layout = {
+                        .sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIT(0)},
+                        .childGap = gui.io.theme->childGap1,
+                        .layoutDirection = CLAY_TOP_TO_BOTTOM
+                    }
+                }) {
+                    innerContent();
+                }
+            }
+        });
+    }
+}
+
+void fixed_height_layout(GUIManager& gui, float height, const std::function<void()>& innerContent) {
+    CLAY_AUTO_ID({
+        .layout = {
+            .sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(height)}
+        }
+    }) {
+        innerContent();
+    }
 }
 
 }}
