@@ -49,6 +49,8 @@ class DrawingProgramLayerManagerGUI {
         float alphaValToEdit = 0.0f;
         size_t blendModeValToEdit = 0;
         bool showLayerHelp = false;
+        DrawingProgramLayerListItem* moveEverythingTarget = nullptr; // Waiting for "Are you sure?"
+        void move_everything_gui(GUIStuff::GUIManager& gui, DrawingProgramLayerListItem* from);
 
         std::set<GUIStuff::TreeListingObjIndexList> selectedLayerIndices;
         NetworkingObjects::NetObjWeakPtr<DrawingProgramLayerListItem> editingLayer;

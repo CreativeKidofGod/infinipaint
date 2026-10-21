@@ -134,6 +134,32 @@ void DrawingProgramLayerManager::switch_editing_layer_to(DrawingProgramLayerList
     searchFolder(*layerTreeRoot);
 }
 
+void DrawingProgramLayerManager::move_all_components_to_layer(DrawingProgramLayerListItem* from, DrawingProgramLayerListItem* to) {
+    if(!from || !to || from == to || from->is_folder() || to->is_folder() || !layer_exists(from) || !layer_exists(to))
+        return;
+    auto& fromComponents = from->get_layer().components;
+    if(fromComponents->empty())
+        return;
+    drawP.selection.deselect_all(); // Selected objects are held outside the layers' cache
+
+    auto layers = get_flattened_layer_list(); // Top first
+    bool fromIsAbove = std::find(layers.begin(), layers.end(), from) < std::find(layers.begin(), layers.end(), to);
+
+    std::vector<CanvasComponentContainer::ObjInfo*> toMove;
+    for(auto& c : *fromComponents)
+        toMove.emplace_back(&c);
+    auto insertIt = fromIsAbove ? to->get_layer().components->end() : to->get_layer().components->begin();
+    std::vector<std::pair<CanvasComponentContainer::ObjInfoIterator, CanvasComponentContainer*>> newObjs;
+    for(auto* c : toMove)
+        newObjs.emplace_back(insertIt, new CanvasComponentContainer(drawP.world.netObjMan, *c->obj->get_data_copy()));
+
+    drawP.world.send_reliable_multi_command_to_all([&]() {
+        add_many_components_to_layer(to, newObjs, true);
+        erase_component_container(toMove, false);
+    });
+    switch_editing_layer_to(to);
+}
+
 bool DrawingProgramLayerManager::layer_exists(DrawingProgramLayerListItem* layer) {
     if(!layer || !layerTreeRoot)
         return false;
@@ -437,10 +463,7 @@ void DrawingProgramLayerManager::load_file(cereal::PortableBinaryInputArchive& a
         });
     }
     else {
-        // Very old canvases (before layers existed) get one plain layer, like official InfiniPaint
-        layerTreeRoot = drawP.world.netObjMan.make_obj_from_ptr<DrawingProgramLayerListItem>(new DrawingProgramLayerListItem(drawP.world.netObjMan, "ROOT", true));
-        layerTreeRoot->get_folder().set_component_list_callbacks(*this);
-        editingLayer = layerTreeRoot->get_folder().folderList->emplace_back_direct(layerTreeRoot->get_folder().folderList, drawP.world.netObjMan, "First Layer", false)->obj;
+        server_init_no_file();
         disable_add_to_cache_and_commit_update_block([&]() {
             CanvasComponentContainer::NetListTemporaryPtr editingLayerTmpPtrComponents = editingLayer.lock()->get_layer().components;
             uint64_t compCount;
@@ -457,8 +480,7 @@ void DrawingProgramLayerManager::load_file(cereal::PortableBinaryInputArchive& a
         comp->obj->commit_update_dont_invalidate_cache(drawP);
     });
     layerTreeRoot->erase_invalid_components();
-    // Custom fork: opening a canvas never adds the four layers. Only new canvases start with them,
-    // so canvases made elsewhere (e.g. official InfiniPaint) keep exactly their own layers.
+    add_missing_locked_layers();
     drawP.rebuild_cache();
     editingLayer = layerTreeRoot->get_folder().get_initial_editing_layer();
 }

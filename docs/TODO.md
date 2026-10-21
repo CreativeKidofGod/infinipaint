@@ -25,10 +25,10 @@ unchecked item in each update until Levi confirms it.
 - [x] Build -11 tested: everything works (2026-10-21). Phase 1c done.
 - [ ] Keep the -11 folder (it's your app now). Delete older folders (-9 and before) after checking no drawings are inside.
 
-## Fix: no layers added on open
+## Move Everything To (layer panel)
 
-- [ ] Test build -12 (checklist in chat).
-- [ ] In any canvas that already got the four extra layers: delete Base, Overlay, Calendar and Writing if they're empty, then save.
+- [ ] Test the new build (checklist in chat).
+- [ ] For the canvas that got the four extra layers: either close without saving, or move/delete as you like, then save.
 
 ## Standing reminders
 

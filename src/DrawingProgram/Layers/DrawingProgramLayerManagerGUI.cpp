@@ -41,7 +41,6 @@ DrawingProgramLayerManagerGUI::DrawingProgramLayerManagerGUI(DrawingProgramLayer
 void DrawingProgramLayerManagerGUI::layer_rules_help_gui(GUIStuff::GUIManager& gui) {
     using namespace GUIStuff::ElementHelpers;
     text_label_light(gui, "Your four layers");
-    text_label(gui, "New canvases start with Base, Overlay, Calendar and Writing. Canvases you open keep their own layers.");
     text_label(gui, "Base and Overlay: pictures and PDFs.");
     text_label(gui, "Calendar: the calendar (coming later).");
     text_label(gui, "Writing: lines, shapes and text.");
@@ -50,6 +49,7 @@ void DrawingProgramLayerManagerGUI::layer_rules_help_gui(GUIStuff::GUIManager& g
     text_label(gui, "Adding a picture or file always asks which layer.");
     text_label(gui, "Putting something where it doesn't usually go asks \"Are you sure?\" first.");
     text_label(gui, "Renaming or deleting one of the four turns off its rules.");
+    text_label(gui, "Opening a canvas made elsewhere adds the four layers on top. To move a whole layer's contents into another, select the layer and use Move Everything To.");
 }
 
 void DrawingProgramLayerManagerGUI::custom_features_help_gui(GUIStuff::GUIManager& gui) {
@@ -59,6 +59,52 @@ void DrawingProgramLayerManagerGUI::custom_features_help_gui(GUIStuff::GUIManage
     text_label_light(gui, "Moving things between layers");
     text_label(gui, "Select something, then right-click > Move To Layer (or use the buttons in the select tools' side panel). It keeps its exact spot and size, and one Undo puts it back.");
     text_label(gui, "With the Edit tool (arrow), one click selects anything on any visible layer.");
+}
+
+void DrawingProgramLayerManagerGUI::move_everything_gui(GUIStuff::GUIManager& gui, DrawingProgramLayerListItem* from) {
+    using namespace GUIStuff::ElementHelpers;
+    // Custom fork: move a whole layer's contents to another layer, without selecting anything
+    if(moveEverythingTarget && (!layerMan.layer_exists(moveEverythingTarget) || moveEverythingTarget == from))
+        moveEverythingTarget = nullptr;
+    uint32_t count = from->get_component_count();
+    if(count == 0) {
+        text_label_light(gui, "This layer is empty.");
+        return;
+    }
+    if(moveEverythingTarget) {
+        text_label(gui, "Move all " + std::to_string(count) + (count == 1 ? " item" : " items") + " from " + from->get_name() + " to " + moveEverythingTarget->get_name() + "? Are you sure?");
+        text_button(gui, "confirm move everything", "Yes, Move Everything", {
+            .wide = true,
+            .onClick = [&, from] {
+                DrawingProgramLayerListItem* to = moveEverythingTarget;
+                moveEverythingTarget = nullptr;
+                layerMan.move_all_components_to_layer(from, to);
+                layerMan.drawP.world.main.g.gui.set_to_layout();
+            }
+        });
+        text_button(gui, "cancel move everything", "Cancel", {
+            .wide = true,
+            .onClick = [&] {
+                moveEverythingTarget = nullptr;
+                layerMan.drawP.world.main.g.gui.set_to_layout();
+            }
+        });
+        return;
+    }
+    text_label(gui, "Move Everything To:");
+    for(DrawingProgramLayerListItem* layer : layerMan.get_flattened_layer_list()) {
+        if(layer == from)
+            continue;
+        gui.new_id(static_cast<int64_t>(reinterpret_cast<intptr_t>(layer)), [&] {
+            text_button(gui, "move everything to layer", layer->get_name(), {
+                .wide = true,
+                .onClick = [&, layer] {
+                    moveEverythingTarget = layer;
+                    layerMan.drawP.world.main.g.gui.set_to_layout();
+                }
+            });
+        });
+    }
 }
 
 void DrawingProgramLayerManagerGUI::refresh_gui_data() {
@@ -464,6 +510,8 @@ void DrawingProgramLayerManagerGUI::setup_list_gui() {
                     }
                 });
             });
+            if(!editingLayerLock->is_folder())
+                move_everything_gui(gui, editingLayerLock.get());
         }
         text_button(gui, "layer rules help", showLayerHelp ? "Hide Layer Rules" : "? Layer Rules", {
             .wide = true,

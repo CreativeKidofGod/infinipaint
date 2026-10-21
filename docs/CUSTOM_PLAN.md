@@ -95,13 +95,17 @@ choices stay true to what Levi asked for.
 - Unchanged from -9: rules are tied to the names Base/Overlay/Calendar/Writing at the top level, so renaming or
   deleting one turns its rules off. Layers Levi adds are plain.
 
-## Fix 2026-10-21: opening a canvas no longer adds the four layers
+## 2026-10-21: "Move Everything To" (layer panel)
 
-- Levi: canvases he made elsewhere (his "original", also used in official InfiniPaint) got Base/Overlay/Calendar/
-  Writing added on top when opened in the fork. Fork-only things must not change his other files.
-- Now only **new** canvases start with the four layers. Opened canvases keep exactly their own layers. Rules still
-  apply if a canvas has layers with those names. Build -12 (custom.8).
-- Rule for all future phases: the fork must never change a canvas just by opening it.
+- Levi saw the four layers added on top of a canvas he made elsewhere. First fix (build -12, cancelled): stop adding
+  them on open. Levi then chose instead: **keep adding the four layers on open**, and add an easy way to move a whole
+  layer's contents to another layer from the layer panel.
+- Select a layer > Edit Layer > "Move Everything To:" lists every other layer. Picking one asks
+  "Move all N items from A to B? Are you sure?" (Yes, Move Everything / Cancel). One Undo reverses it.
+  Contents go on top of the target's contents if the source layer was above it, else underneath, so the picture
+  looks the same. Covers part of "merge down" (planned item 8), but to any layer.
+- WATCH OUT for Phase 2: with autosave, opening an official canvas in the fork and making any edit will save the
+  four added layers into that file within a minute. Levi accepted adding layers on open; remind him before Phase 2.
 
 ## Planned features (in order)
 

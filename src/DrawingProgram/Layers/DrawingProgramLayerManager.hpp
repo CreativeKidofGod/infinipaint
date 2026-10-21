@@ -57,6 +57,9 @@ class DrawingProgramLayerManager {
         void add_missing_locked_layers();
         void switch_editing_layer_to(DrawingProgramLayerListItem* layer);
         bool layer_exists(DrawingProgramLayerListItem* layer);
+        // Moves everything on one layer to another in one undo step, keeping how it looks:
+        // goes on top of the target's contents if the source layer was above it, else underneath.
+        void move_all_components_to_layer(DrawingProgramLayerListItem* from, DrawingProgramLayerListItem* to);
         DrawingProgramLayerListItem* get_editing_layer();
         // When set, new objects go into this layer instead of being routed (used after asking the user)
         DrawingProgramLayerListItem* forcedInsertLayer = nullptr;
