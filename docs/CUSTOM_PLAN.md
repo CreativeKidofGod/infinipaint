@@ -164,6 +164,16 @@ choices stay true to what Levi asked for.
    - **Snip tool (Levi, 2026-10-08):** select part of a PDF page or image on the board and copy it as its own
      object to move, edit or reuse elsewhere. PDF snips stay vector (sharp at any zoom); image snips keep the
      original pixels (crop, no quality loss).
+   - **Editable PDF text (Levi, 2026-10-21):**
+     - "Make Editable": select part of a PDF page and turn its text into normal InfiniPaint text boxes, placed exactly
+       where the text was, keeping font, size, bold/italic, line spacing and indentation as closely as possible.
+       The original text underneath is hidden (cropped or covered) so it isn't doubled. Then move/edit like any text box.
+     - "Copy With Formatting": copy PDF text so pasting into Word/Docs/a text box keeps fonts, sizes, spacing and
+       indents (put on the clipboard as rich text/HTML as well as plain text). InfiniPaint already pastes rich text.
+     - Limits: fonts embedded in the PDF but not installed on the PC may fall back to a close match unless the
+       embedded font can be loaded. Columns, tables and math come out approximately. Scanned PDFs need OCR first
+       (see item 6). Turning text editable can't be fully "re-flowed" like Word, only per line/paragraph boxes.
+     - Same idea can later cover Word/.docx files (import as editable text boxes).
    - Idea to decide later: on import, offer "trace to vector" for simple graphics (diagrams, logos, text) so they
      zoom sharply. Photos can only be AI-upscaled, which adds made-up detail.
      Levi (2026-10-08): he mostly imports PDFs and simple diagram images, so tracing diagrams is the useful case.
