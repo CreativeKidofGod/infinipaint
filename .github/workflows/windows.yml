@@ -61,8 +61,12 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: C:\c2\p
-          key: conan-win-x86_64-msvc${{ steps.msvc.outputs.version }}-${{ hashFiles('conanfile.py', 'conan/**', 'conan/profiles/win-x86_64') }}
+          # Exact key never matches (it ends in the run id), so the newest saved cache is restored
+          # and every run saves a fresh one. Otherwise a stale cache that Conan no longer accepts
+          # (e.g. after a Conan update) would be restored forever and Skia rebuilt every time.
+          key: conan-win-x86_64-msvc${{ steps.msvc.outputs.version }}-${{ hashFiles('conanfile.py', 'conan/**', 'conan/profiles/win-x86_64') }}-${{ github.run_id }}
           restore-keys: |
+            conan-win-x86_64-msvc${{ steps.msvc.outputs.version }}-${{ hashFiles('conanfile.py', 'conan/**', 'conan/profiles/win-x86_64') }}-
             conan-win-x86_64-msvc${{ steps.msvc.outputs.version }}-
 
       - name: Export custom Conan recipes
@@ -85,7 +89,7 @@ jobs:
         uses: actions/cache/save@v6
         with:
           path: C:\c2\p
-          key: conan-win-x86_64-msvc${{ steps.msvc.outputs.version }}-${{ hashFiles('conanfile.py', 'conan/**', 'conan/profiles/win-x86_64') }}
+          key: conan-win-x86_64-msvc${{ steps.msvc.outputs.version }}-${{ hashFiles('conanfile.py', 'conan/**', 'conan/profiles/win-x86_64') }}-${{ github.run_id }}
 
       - name: Build InfiniPaint (portable)
         shell: cmd
