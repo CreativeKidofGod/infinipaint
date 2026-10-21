@@ -28,7 +28,7 @@ unchecked item in each update until Levi confirms it.
 ## Move Everything To (layer panel)
 
 - [x] Build -13: Move Everything To works (2026-10-21), but long lists squished the panel.
-- [ ] Test the scroll-bar build (checklist in chat).
+- [ ] Test build -14 (scroll bars, checklist in chat). Link: https://github.com/CreativeKidofGod/infinipaint/actions/runs/39559531996/artifacts/12328922267 (expires 2026-11-20).
 - [ ] For the canvas that got the four extra layers: either close without saving, or move/delete as you like, then save.
 
 ## Standing reminders
