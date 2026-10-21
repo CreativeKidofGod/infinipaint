@@ -142,6 +142,8 @@ choices stay true to what Levi asked for.
      has no text either. Works well on clear typed text (screenshots, diagram labels); weaker on blurry, tiny or
      handwritten text. Matches are highlighted on the picture.
 7. **From GPL forks** (code can be borrowed):
+   - Note 2026-10-21: official InfiniPaint added its own brush smoothing option (main branch, after v0.6.3).
+     Use that when merging official updates instead of borrowing pen smoothing from a fork.
    - Pen smoothing, lasso fill, dashed lines/arrows, and lock against accidental drawing: alexiokay/infinipaint-Custom.
    - Paint bucket: SquireofNowhere/infinipaint.
 8. **Big-canvas tools.**
