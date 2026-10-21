@@ -41,8 +41,7 @@ choices stay true to what Levi asked for.
 - **The display version is "0.6.1-custom.N", but the internal version stays "0.6.1".**
   Why: config.json and the update checker parse the version as numbers, and a suffix would break settings loading.
 - **NOTICE, window title and About screen mark this as a modified, unofficial build.** Why: GPL requires it, and honesty if sold.
-- **WARNING:** the portable build keeps config, and the default save folder, next to the exe.
-  Replacing the app folder can delete canvases saved there. Warn Levi before every update until Phase 2 fixes it.
+- (Fixed in Phase 2: config and the default save folder no longer live next to the exe.)
 
 ## Phase 1: locked layers (done, confirmed by Levi on build -9, 2026-10-08)
 
@@ -128,6 +127,26 @@ choices stay true to what Levi asked for.
   (switch to windows-2025), and old Node-based actions (ilammy/msvc-dev-cmd still uses Node 20).
 - Artifact downloads expire after 30 days; the copy on Levi's PC never does. For a permanent download of a good
   build, push a tag like v0.6.1-custom.9 (publishes a GitHub Release, public).
+
+## Phase 2: keeping work safe (built 2026-10-21, build -15, waiting for Levi's test)
+
+- **Autosave every minute** while there are unsaved changes (counting starts at the first change). Canvases with a
+  file save over it; new canvases save into the canvas folder under their tab name. Autosave is quiet (no popup).
+- **Crash-safe saving:** every save writes "<name>.infpnt.saving" first, then swaps it in. A crash or full disk
+  mid-save can't damage the existing file.
+- **Canvas folder:** default C:\Users\<you>\InfiniPaint Canvases (outside OneDrive), created at startup.
+  Settings > General > Canvas Folder changes it and warns if it's in OneDrive. File windows start there. The
+  "save before closing" popup saves new canvases there (it used to use Documents, which syncs to OneDrive).
+- **Settings survive updates:** stored in %APPDATA%\CreativeKidofGod\infinipaint-custom instead of next to the app.
+  If a "config" folder is next to the app on first start, it's copied over once.
+- **Last 3 backups per canvas**, made after a save at most every 30 minutes, kept in the settings folder (so they
+  survive the canvas being deleted). Pictures/files are stored once and shared between backups (by content hash);
+  unused ones are cleaned up. Menu > Backups lists every canvas (even deleted ones) and "Open Copy From <time>"
+  rebuilds a normal .infpnt "<name> (Backup <time>)" in the canvas folder and opens it. Never overwrites anything.
+  Rebuild verified byte-identical with a local test.
+- WATCH OUT (Levi accepted): opening a canvas made elsewhere adds the four layers; with autosave, any edit saves
+  them into that file within a minute. Use Save As first for files that must stay untouched.
+- Not done here (later): double-clicking a canvas opens the official app (file association) - can be a setting later.
 
 ## Planned features (in order)
 

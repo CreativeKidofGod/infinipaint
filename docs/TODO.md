@@ -32,11 +32,16 @@ unchecked item in each update until Levi confirms it.
 - [ ] Keep the -14 folder (it's your app now). Delete -13, -11 and older after checking no drawings are inside.
 - [ ] For the canvas that got the four extra layers: either close without saving, or move/delete as you like, then save.
 
+## Phase 2 (keeping work safe)
+
+- [ ] Test build -15 (checklist in chat).
+
 ## Standing reminders
 
-- The portable app keeps settings, and its default save folder, inside the app
-  folder. Don't save canvases there, and don't delete or replace that folder
-  without moving canvases out first. (Phase 2 fixes this.)
+- Until -15 is tested: the app keeps settings inside its folder. Don't save
+  canvases inside the app folder. (Fixed in -15.)
+- With -15: autosave saves every minute. For a canvas you want to keep
+  untouched (e.g. for the official app), use Save As with a new name first.
 - Keep canvases outside OneDrive. Documents and Desktop on this PC sync to
   OneDrive, so don't save canvases there.
 - The official InfiniPaint is also installed. Double-clicking a canvas opens

@@ -587,6 +587,13 @@ void Toolbar::top_toolbar() {
                                 optionsMenuOpen = true;
                                 optionsMenuType = GENERAL_SETTINGS_MENU;
                             });
+                            #ifndef __EMSCRIPTEN__
+                                menu_popup_text_button("backups menu button", "Backups", [&] {
+                                    backupsList = CanvasBackups::list_all(main.conf.configPath);
+                                    optionsMenuOpen = true;
+                                    optionsMenuType = BACKUPS_MENU;
+                                });
+                            #endif
                             menu_popup_text_button("about menu button", "About", [&] {
                                 optionsMenuOpen = true;
                                 optionsMenuType = ABOUT_MENU;
@@ -1426,6 +1433,12 @@ void Toolbar::options_menu() {
             });
             break;
         }
+        case BACKUPS_MENU: {
+            center_obstructing_window_gui("backups menu", CLAY_SIZING_FIXED(650), CLAY_SIZING_FIT(0, 550), [&] {
+                backups_menu_inner_gui();
+            });
+            break;
+        }
     }
 }
 
@@ -1806,6 +1819,56 @@ void Toolbar::about_menu_inner_gui() {
         });
     });
     text_button_wide("done", "Done", [&] {
+        optionsMenuOpen = false;
+    });
+}
+
+void Toolbar::backups_menu_inner_gui() {
+    using namespace GUIStuff;
+    using namespace ElementHelpers;
+    auto& gui = main.g.gui;
+
+    text_label_centered(gui, "Backups");
+    text_label_light(gui, "The last " + std::to_string(CanvasBackups::BACKUPS_TO_KEEP) + " backups of each canvas, made at most every " + std::to_string(CanvasBackups::MINUTES_BETWEEN_BACKUPS) + " minutes while you save. They're kept even if the canvas file is deleted.");
+    text_label_light(gui, "Opening a backup makes a copy in your canvas folder. The original canvas is never changed.");
+    if(backupsList.empty())
+        text_label(gui, "No backups yet. They appear after you save a canvas.");
+    else {
+        scroll_list_layout(gui, "backups list scroll", 380.0f, [&] {
+            for(size_t i = 0; i < backupsList.size(); i++) {
+                auto& canvas = backupsList[i];
+                gui.new_id(static_cast<int64_t>(i), [&] {
+                    text_label(gui, canvas.canvasName + (canvas.originalStillExists ? "" : "  (file deleted or moved)"));
+                    if(!canvas.originalPath.empty())
+                        text_label_light(gui, canvas.originalPath.string());
+                    for(size_t j = 0; j < canvas.backups.size(); j++) {
+                        gui.new_id(static_cast<int64_t>(j), [&] {
+                            text_button(gui, "open backup", "Open Copy From " + canvas.backups[j].timeText, {
+                                .wide = true,
+                                .onClick = [&, i, j] {
+                                    if(i >= backupsList.size() || j >= backupsList[i].backups.size())
+                                        return;
+                                    std::string error;
+                                    auto restored = CanvasBackups::restore_to_folder(backupsList[i], backupsList[i].backups[j], main.conf.canvasFolder, error);
+                                    if(!restored) {
+                                        Logger::get().log(Logger::LogType::WORLDFATAL, "Couldn't open backup: " + error);
+                                        return;
+                                    }
+                                    optionsMenuOpen = false;
+                                    CustomEvents::emit_event<CustomEvents::OpenInfiniPaintFileEvent>({
+                                        .isClient = false,
+                                        .filePathSource = restored.value()
+                                    });
+                                    Logger::get().log(Logger::LogType::DESKTOP_USERINFO, "Opened a copy of the backup: " + restored.value().filename().string());
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        });
+    }
+    text_button_wide("done backups", "Done", [&] {
         optionsMenuOpen = false;
     });
 }

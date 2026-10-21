@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include "CanvasBackups.hpp"
 #include "GUIStuff/Elements/ScrollArea.hpp"
 #include "DrawData.hpp"
 #include "TimePoint.hpp"
@@ -108,6 +109,8 @@ class Toolbar {
         void open_world_file(bool isClient, const std::string& netSource, const std::string& serverLocalID);
         void load_default_theme();
         void about_menu_inner_gui();
+        void backups_menu_inner_gui();
+        std::vector<CanvasBackups::CanvasBackupList> backupsList; // Read from disk when the Backups window opens
         void web_version_welcome();
         void center_message(const char* id, const std::string& m);
         void close_popup_gui();
@@ -165,7 +168,8 @@ class Toolbar {
             LOBBY_INFO_MENU,
             CANVAS_SETTINGS_MENU,
             SET_DOWNLOAD_NAME,
-            ABOUT_MENU
+            ABOUT_MENU,
+            BACKUPS_MENU
         } optionsMenuType;
         enum GeneralSettingsOptions {
             GSETTINGS_GENERAL = 0,
