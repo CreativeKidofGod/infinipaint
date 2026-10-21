@@ -160,6 +160,11 @@ choices stay true to what Levi asked for.
 
 ## Ideas noted for later (not scheduled yet)
 
+- **Official updates (2026-10-21):** official InfiniPaint is at v0.6.3 (37 commits after this fork's base, same save
+  format). Before Phase 2, merge those updates into the fork so Levi gets the fixes without losing custom features.
+  Also stop the custom app's "Update available" popup from pointing at the official download (it would install the
+  official app, not the custom one); later it could point at this fork's releases instead.
+
 - **Copy out of InfiniPaint (Levi, 2026-10-12):** select an image (or PDF snip), copy it, and paste it into
   another app or text box outside InfiniPaint (Word, Docs, chat, email). Put it on the Windows clipboard as a
   normal image. Fits with Phase 4 (snip tool) or Phase 5 (export).
