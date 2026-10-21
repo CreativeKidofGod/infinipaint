@@ -29,6 +29,10 @@ class GlobalConfig {
         GlobalConfig();
 
         std::filesystem::path currentSearchPath;
+        // Custom fork: where canvases are saved by default and where new canvases autosave.
+        // Empty until set up at startup (default: <home>/InfiniPaint Canvases).
+        std::filesystem::path canvasFolder;
+        static bool path_looks_like_onedrive(const std::filesystem::path& p);
 
         std::string ownLicenseText;
         std::vector<std::pair<std::string, std::string>> thirdPartyLicenses;

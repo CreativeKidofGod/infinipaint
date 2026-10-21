@@ -21,6 +21,7 @@
 #include "VersionConstants.hpp"
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
+#include <SDL3/SDL_filesystem.h>
 #include <include/core/SkAlphaType.h>
 #include <include/core/SkColor.h>
 #include <include/core/SkPaint.h>
@@ -181,6 +182,22 @@ void MainProgram::background_update() {
 
 bool MainProgram::app_close_requested() {
     return screen->app_close_requested();
+}
+
+void MainProgram::setup_canvas_folder() {
+    // Custom fork: one folder for canvases, outside the app folder (and outside OneDrive by default)
+    if(conf.canvasFolder.empty()) {
+        const char* homeSDL = SDL_GetUserFolder(SDL_FOLDER_HOME);
+        std::filesystem::path home = homeSDL ? std::filesystem::path(std::u8string_view(reinterpret_cast<const char8_t*>(homeSDL))) : documentsPath;
+        conf.canvasFolder = home / "InfiniPaint Canvases";
+    }
+    std::error_code ec;
+    std::filesystem::create_directories(conf.canvasFolder, ec);
+    if(ec)
+        Logger::get().log(Logger::LogType::INFO, "Couldn't create canvas folder " + conf.canvasFolder.string() + ": " + ec.message());
+    // File picker starts in the canvas folder instead of the app folder
+    if(conf.currentSearchPath.empty() || conf.currentSearchPath == homePath)
+        conf.currentSearchPath = conf.canvasFolder;
 }
 
 void MainProgram::update_display_names() {

@@ -53,6 +53,7 @@ class World {
         NetworkingObjects::NetObjManager netObjMan;
 
         void save_file(cereal::PortableBinaryOutputArchive& a) const;
+        void save_file_without_resources(cereal::PortableBinaryOutputArchive& a) const;
         void load_file(cereal::PortableBinaryInputArchive& a, VersionNumber version);
 
         MainProgram& main;
@@ -83,8 +84,8 @@ class World {
 
         bool clientStillConnecting = false;
 
-        void autosave_to_directory(const std::filesystem::path& directoryToSaveAt);
-        void save_to_file(const std::filesystem::path& filePathToSaveAt);
+        void autosave_to_directory(const std::filesystem::path& directoryToSaveAt, bool isAutosave = false);
+        void save_to_file(const std::filesystem::path& filePathToSaveAt, bool isAutosave = false);
         void load_from_file(const std::filesystem::path& filePathToLoadFrom, std::string_view buffer);
 
         void undo_with_checks();
@@ -133,6 +134,10 @@ class World {
     private:
         bool saveThumbnail = false;
         bool hasUnsavedLocalChanges = false;
+
+        // Custom fork: autosave a minute after changes start, and keep trying every minute
+        void autosave_update();
+        std::chrono::steady_clock::time_point lastSaveOrAutosaveAttempt = std::chrono::steady_clock::now();
 
         void load_empty_canvas(const std::optional<std::filesystem::path>& filePathEmptyAutoSaveDir = std::nullopt);
 

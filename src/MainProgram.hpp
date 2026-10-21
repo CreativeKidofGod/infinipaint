@@ -131,6 +131,7 @@ class MainProgram {
         bool network_being_used();
         bool net_server_hosted();
         void update_display_names();
+        void setup_canvas_folder();
 
         void save_config();
         void load_config();
