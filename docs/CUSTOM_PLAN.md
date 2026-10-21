@@ -83,7 +83,7 @@ choices stay true to what Levi asked for.
 - Built as -10 (Any/Pictures/Writing kinds stored in the file), then dropped by Levi: keep the original four-layer
   system and optimize later only if needed. Code reverted. Canvases stay openable in official InfiniPaint.
 
-## Phase 1c: -9 plus three extras (Levi, 2026-10-13)
+## Phase 1c: -9 plus three extras (Levi, 2026-10-13; done, confirmed by Levi on build -11, 2026-10-21)
 
 1. Edit tool: one click selects anything on any visible layer (including layers Levi makes); the app switches to it.
 2. Move To (right-click and side panel) and the insert question list **every** layer, top to bottom, with "(Current)".
@@ -163,7 +163,7 @@ choices stay true to what Levi asked for.
 ## Ideas noted for later (not scheduled yet)
 
 - **Official updates (2026-10-21):** official InfiniPaint is at v0.6.3 (37 commits after this fork's base, same save
-  format). Before Phase 2, merge those updates into the fork so Levi gets the fixes without losing custom features.
+  format). Levi (2026-10-21): "eventually", no rush. When we do, merge those updates into the fork so Levi gets the fixes without losing custom features.
   Also stop the custom app's "Update available" popup from pointing at the official download (it would install the
   official app, not the custom one); later it could point at this fork's releases instead.
 

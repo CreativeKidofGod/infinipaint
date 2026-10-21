@@ -18,11 +18,12 @@ unchecked item in each update until Levi confirms it.
 - [x] Build -6: right-click Move To buttons work (2026-10-08).
 - [x] Build -7: "Are you sure?" when moving lines/shapes off Writing works (2026-10-08).
 - [x] Build -9: everything works (2026-10-08). Phase 1 done.
-- [ ] Keep the -9 folder (its download link expires 2026-11-07). Delete -6, -7, -8 after checking no drawings are inside.
+- [x] -9 replaced by -11.
 
 ## Phase 1c (-9 plus extras)
 
-- [ ] When ready: download build -11 and test it (5-step checklist in chat). Skip -10, it was dropped. Link: https://github.com/CreativeKidofGod/infinipaint/actions/runs/38342098642/artifacts/11787686839 (expires 2026-11-12).
+- [x] Build -11 tested: everything works (2026-10-21). Phase 1c done.
+- [ ] Keep the -11 folder (it's your app now). Delete older folders (-9 and before) after checking no drawings are inside.
 
 ## Standing reminders
 
