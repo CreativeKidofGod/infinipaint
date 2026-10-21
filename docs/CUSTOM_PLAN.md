@@ -136,6 +136,11 @@ choices stay true to what Levi asked for.
 5. **Export a region as PDF** (SVG/PNG/JPG/WEBP export already exist; Skia has a PDF backend).
 6. **Ctrl+F search.**
    - Covers typed text, PDF text, and handwriting (Windows' built-in, offline handwriting recognition).
+   - **Also text inside pictures (PNG, JPG, etc.)** (Levi, 2026-10-21): read once with Windows' built-in, offline
+     text recognition (OCR) when the picture is added (and in the background for pictures already on the board),
+     then saved as hidden searchable text. No need to convert pictures to PDF first: a PDF made from a picture
+     has no text either. Works well on clear typed text (screenshots, diagram labels); weaker on blurry, tiny or
+     handwritten text. Matches are highlighted on the picture.
 7. **From GPL forks** (code can be borrowed):
    - Pen smoothing, lasso fill, dashed lines/arrows, and lock against accidental drawing: alexiokay/infinipaint-Custom.
    - Paint bucket: SquireofNowhere/infinipaint.
