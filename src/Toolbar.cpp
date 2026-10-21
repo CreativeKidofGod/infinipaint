@@ -309,7 +309,7 @@ void Toolbar::close_popup_gui() {
                                     }
                                 }) {
                                     text_label(gui, wLock->name);
-                                    text_label_light(gui, wLock->filePath.empty() ? "Autosave in " + main.documentsPath.string() : wLock->filePath.string());
+                                    text_label_light(gui, wLock->filePath.empty() ? "Autosave in " + main.conf.canvasFolder.string() : wLock->filePath.string());
                                 }
                             });
                         }
@@ -325,7 +325,7 @@ void Toolbar::close_popup_gui() {
                     auto wLock = w.lock();
                     if(setToSave) {
                         if(wLock->filePath.empty())
-                            wLock->autosave_to_directory(main.documentsPath);
+                            wLock->autosave_to_directory(main.conf.canvasFolder);
                         else
                             wLock->save_to_file(wLock->filePath);
                     }
@@ -1507,11 +1507,16 @@ void Toolbar::general_settings_inner_gui() {
                         });
                         color_picker_button_field(gui, "defaultCanvasBackgroundColor", "Default Canvas Background Color", &main.conf.defaultCanvasBackgroundColor, { .hasAlpha = false });
                         #ifndef __EMSCRIPTEN__
+                            input_path_field(gui, "canvas folder", "Canvas Folder", &main.conf.canvasFolder, {
+                                .fileTypeRestriction = std::filesystem::file_type::directory
+                            });
+                            if(GlobalConfig::path_looks_like_onedrive(main.conf.canvasFolder))
+                                text_label(gui, "Warning: this folder syncs to OneDrive. Big canvases will upload over and over and can get sync conflicts.");
                             checkbox_boolean_field(gui, "native file pick", "Use Native File Picker", &main.conf.useNativeFilePicker);
                             checkbox_boolean_field(gui, "update notifications enable", "Check For Updates On Startup", &main.conf.checkForUpdates);
                         #endif
-                        slider_scalar_field(gui, "drag zoom slider", "Drag zoom speed", &main.conf.dragZoomSpeed, 0.0, 1.0, {.decimalPrecision = 3});
-                        slider_scalar_field(gui, "scroll zoom slider", "Scroll zoom speed", &main.conf.scrollZoomSpeed, 0.0, 1.0, {.decimalPrecision = 3});
+                        slider_scalar_field(gui, "drag zoom slider", "Drag Zoom Speed", &main.conf.dragZoomSpeed, 0.0, 1.0, {.decimalPrecision = 3});
+                        slider_scalar_field(gui, "scroll zoom slider", "Scroll Zoom Speed", &main.conf.scrollZoomSpeed, 0.0, 1.0, {.decimalPrecision = 3});
                         checkbox_boolean_field(gui, "flip zoom tool direction", "Flip Zoom Tool Direction", &main.conf.flipZoomToolDirection);
                         checkbox_boolean_field(gui, "make all tools share same size", "Make All Tools Share Size", &main.toolConfig.globalConf.useGlobalRelativeWidth);
                         input_scalar_field(gui, "jump transition time", "Jump Transition Time", &main.conf.jumpTransitionTime, 0.01f, 1000.0f, {.decimalPrecision = 2});

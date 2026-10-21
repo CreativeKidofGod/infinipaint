@@ -33,6 +33,15 @@ GlobalConfig::GlobalConfig() {
         timeFormat = SDL_TIME_FORMAT_12HR; // For now, lock at 12 hour since it's the most used format, and time format detection doesn't work properly all the time
 }
 
+bool GlobalConfig::path_looks_like_onedrive(const std::filesystem::path& p) {
+    for(auto& part : p) {
+        std::u8string s = part.u8string();
+        if(s.rfind(u8"OneDrive", 0) == 0) // "OneDrive" or "OneDrive - Company"
+            return true;
+    }
+    return false;
+}
+
 nlohmann::json GlobalConfig::get_config_json(const InputManager& input) const {
     using json = nlohmann::json;
     json toRet;
@@ -64,6 +73,10 @@ nlohmann::json GlobalConfig::get_config_json(const InputManager& input) const {
     toRet["displayName"] = displayName;
     toRet["antialiasing"] = antialiasing;
     toRet["useNativeFilePicker"] = useNativeFilePicker;
+    {
+        std::u8string canvasFolderU8 = canvasFolder.u8string();
+        toRet["canvasFolder"] = std::string(canvasFolderU8.begin(), canvasFolderU8.end());
+    }
     toRet["themeInUse"] = themeCurrentlyLoaded;
     toRet["defaultCanvasBackgroundColor"] = defaultCanvasBackgroundColor;
     toRet["flipZoomToolDirection"] = flipZoomToolDirection;
@@ -142,6 +155,11 @@ void GlobalConfig::set_config_json(InputManager& input, const nlohmann::json& j,
     try{j.at("disableGraphicsDriverWorkarounds").get_to(disableGraphicsDriverWorkarounds);} catch(...) {}
     try{j.at("viewWebVersionWelcome").get_to(viewWebVersionWelcome);} catch(...) {}
     try{j.at("useNativeFilePicker").get_to(useNativeFilePicker);} catch(...) {}
+    try{
+        std::string canvasFolderStr;
+        j.at("canvasFolder").get_to(canvasFolderStr);
+        canvasFolder = std::filesystem::path(std::u8string(canvasFolderStr.begin(), canvasFolderStr.end()));
+    } catch(...) {}
     try{j.at("themeInUse").get_to(themeCurrentlyLoaded);} catch(...) {}
     if(version >= VersionNumber(0, 3, 0))
         try{j.at("defaultCanvasBackgroundColor").get_to(defaultCanvasBackgroundColor);} catch(...) {}

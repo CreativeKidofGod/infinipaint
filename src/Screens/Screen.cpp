@@ -49,10 +49,14 @@ void Screen::open_file_selector(const std::string& filePickerName, const std::ve
         nativeFilePicker.sdlFileFilters.clear();
         for(auto& e : nativeFilePicker.extensionFiltersComplete)
             nativeFilePicker.sdlFileFilters.emplace_back(e.name.c_str(), e.extensions.c_str());
+        // Custom fork: start in the canvas folder
+        std::u8string startFolderU8 = main.conf.canvasFolder.u8string(); // SDL wants UTF-8
+        std::string startFolder(startFolderU8.begin(), startFolderU8.end());
+        const char* startFolderPtr = startFolder.empty() ? nullptr : startFolder.c_str();
         if(isSaving)
-            SDL_ShowSaveFileDialog(sdl_open_file_dialog_callback, nullptr, main.window.sdlWindow, nativeFilePicker.sdlFileFilters.data(), nativeFilePicker.sdlFileFilters.size(), nullptr);
+            SDL_ShowSaveFileDialog(sdl_open_file_dialog_callback, nullptr, main.window.sdlWindow, nativeFilePicker.sdlFileFilters.data(), nativeFilePicker.sdlFileFilters.size(), startFolderPtr);
         else
-            SDL_ShowOpenFileDialog(sdl_open_file_dialog_callback, nullptr, main.window.sdlWindow, nativeFilePicker.sdlFileFilters.data(), nativeFilePicker.sdlFileFilters.size(), nullptr, false);
+            SDL_ShowOpenFileDialog(sdl_open_file_dialog_callback, nullptr, main.window.sdlWindow, nativeFilePicker.sdlFileFilters.data(), nativeFilePicker.sdlFileFilters.size(), startFolderPtr, false);
     }
 }
 

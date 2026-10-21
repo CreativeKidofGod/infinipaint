@@ -54,6 +54,7 @@ class ResourceManager {
         void clear_display_cache();
 
         void load_file(cereal::PortableBinaryInputArchive& a, VersionNumber version);
+        std::unordered_map<NetworkingObjects::NetObjID, ResourceData> get_saved_resources() const; // Only resources the canvas uses
         void save_file(cereal::PortableBinaryOutputArchive& a) const;
 
         World& world;

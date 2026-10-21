@@ -51,6 +51,7 @@
 #include "CanvasComponents/CanvasComponentAllocator.hpp"
 #include "WorldScreenshot.hpp"
 #include "FileHelpers.hpp"
+#include "CanvasBackups.hpp"
 
 #ifdef __EMSCRIPTEN__
     #include <EmscriptenHelpers/emscripten_browser_file.h>
@@ -274,6 +275,29 @@ void World::redo_with_checks() {
 
 void World::update() {
     connection_update();
+    autosave_update();
+}
+
+void World::autosave_update() {
+#ifndef __EMSCRIPTEN__
+    constexpr auto AUTOSAVE_INTERVAL = std::chrono::minutes(1);
+    if(clientStillConnecting || netClient)
+        return;
+    auto now = std::chrono::steady_clock::now();
+    if(!hasUnsavedLocalChanges) {
+        lastSaveOrAutosaveAttempt = now; // The minute starts counting when changes start
+        return;
+    }
+    if(now - lastSaveOrAutosaveAttempt < AUTOSAVE_INTERVAL)
+        return;
+    lastSaveOrAutosaveAttempt = now;
+    if(filePath.empty()) {
+        if(!main.conf.canvasFolder.empty())
+            autosave_to_directory(main.conf.canvasFolder, true);
+    }
+    else
+        save_to_file(filePath, true);
+#endif
 }
 
 void World::on_tab_out() {
@@ -477,7 +501,7 @@ void World::start_hosting(const std::string& initNetSource, const std::string& s
     });
 }
 
-void World::autosave_to_directory(const std::filesystem::path& directoryToSaveAt) {
+void World::autosave_to_directory(const std::filesystem::path& directoryToSaveAt, bool isAutosave) {
     std::vector<std::string> strList;
     try {
         strList = glob_path_as_string_list(directoryToSaveAt, ("*" + World::DOT_FILE_EXTENSION).c_str(), 0, [&](const auto& p){ return p.stem().string();});
@@ -485,10 +509,11 @@ void World::autosave_to_directory(const std::filesystem::path& directoryToSaveAt
     catch(...) {
     }
     std::string nameToSaveUnder = ensure_string_unique(strList, name);
-    save_to_file(directoryToSaveAt / std::filesystem::path(nameToSaveUnder + "." + FILE_EXTENSION));
+    save_to_file(directoryToSaveAt / std::filesystem::path(nameToSaveUnder + "." + FILE_EXTENSION), isAutosave);
 }
 
-void World::save_to_file(const std::filesystem::path& filePathToSaveAt) {
+void World::save_to_file(const std::filesystem::path& filePathToSaveAt, bool isAutosave) {
+    lastSaveOrAutosaveAttempt = std::chrono::steady_clock::now();
     try {
         if(main.conf.forceExtensionOnPath)
             filePath = force_extension_on_path(filePathToSaveAt, FILE_EXTENSION);
@@ -521,9 +546,26 @@ void World::save_to_file(const std::filesystem::path& filePathToSaveAt) {
                 f.view()
             );
         #else
-            if(!SDL_SaveFile(filePath.string().c_str(), f.view().data(), f.view().size()))
+            // Custom fork: write to a temporary file first, then swap it in, so a crash or full disk
+            // in the middle of saving never damages the existing canvas file.
+            std::filesystem::path tempPath = filePath;
+            tempPath += ".saving";
+            if(!SDL_SaveFile(tempPath.string().c_str(), f.view().data(), f.view().size())) {
+                std::error_code removeEc;
+                std::filesystem::remove(tempPath, removeEc);
                 throw std::runtime_error("SDL_SaveFile failed with error: " + std::string(SDL_GetError()));
-            else if(saveThumbnail) {
+            }
+            {
+                std::error_code renameEc;
+                std::filesystem::rename(tempPath, filePath, renameEc);
+                if(renameEc) {
+                    std::error_code removeEc;
+                    std::filesystem::remove(tempPath, removeEc);
+                    throw std::runtime_error("Couldn't replace the canvas file: " + renameEc.message());
+                }
+            }
+            CanvasBackups::after_save(*this);
+            if(saveThumbnail) {
                 Vector2f imageCenter{main.window.size.x() * 0.5f, main.window.size.y() * 0.5f};
                 float imageDim = std::max(main.window.size.x(), main.window.size.y());
                 Vector2f imageDimVec{imageDim * 0.5f, imageDim * 0.5f};
@@ -540,7 +582,7 @@ void World::save_to_file(const std::filesystem::path& filePathToSaveAt) {
             }
         #endif
 
-        Logger::get().log(Logger::LogType::DESKTOP_USERINFO, "File saved");
+        Logger::get().log(isAutosave ? Logger::LogType::INFO : Logger::LogType::DESKTOP_USERINFO, isAutosave ? "Autosaved " + filePath.string() : "File saved");
         undo.set_save_action();
     }
     catch(const std::exception& e) {
@@ -605,12 +647,17 @@ void World::load_from_file(const std::filesystem::path& filePathToLoadFrom, std:
 }
 
 void World::save_file(cereal::PortableBinaryOutputArchive& a) const {
+    save_file_without_resources(a);
+    rMan.save_file(a);
+}
+
+void World::save_file_without_resources(cereal::PortableBinaryOutputArchive& a) const {
+    // Everything before the resources (pictures/files). Backups store resources separately, once each.
     drawData.cam.save_file(a, *this);
     canvasTheme.save_file(a);
     drawProg.save_file(a);
     bMan.save_file(a);
     gridMan.save_file(a);
-    rMan.save_file(a);
 }
 
 void World::load_file(cereal::PortableBinaryInputArchive& a, VersionNumber version) {

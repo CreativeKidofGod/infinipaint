@@ -438,6 +438,14 @@ void init_logs(MainStruct& mS) {
     char* configPathSDL = SDL_GetPrefPath("CreativeKidofGod", "infinipaint-custom");
     mS.configPath = std::filesystem::path(configPathSDL);
     SDL_free(configPathSDL);
+    {
+        // Custom fork: builds up to -11 kept settings in a "config" folder next to the app.
+        // If that folder is here and there are no settings yet, copy it once so nothing is lost.
+        std::error_code ec;
+        std::filesystem::path oldConfigPath = mS.homePath / "config";
+        if(!std::filesystem::exists(mS.configPath / "config.json", ec) && std::filesystem::exists(oldConfigPath / "config.json", ec))
+            std::filesystem::copy(oldConfigPath, mS.configPath, std::filesystem::copy_options::recursive | std::filesystem::copy_options::skip_existing, ec);
+    }
 #endif
     mS.logFile = std::ofstream(mS.configPath / "log.txt");
     Logger::get().set_log_function(Logger::LogType::FATAL, [&, mS = &mS](const std::string& text) {
@@ -498,6 +506,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         #endif
         mS.m->update_scale_and_density();
         mS.m->load_config();
+        #ifndef __EMSCRIPTEN__
+            mS.m->setup_canvas_folder();
+        #endif
 
         initialize_sdl(mS);
 

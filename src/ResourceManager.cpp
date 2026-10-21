@@ -198,7 +198,7 @@ void ResourceManager::load_file(cereal::PortableBinaryInputArchive& a, VersionNu
         resourceList.emplace_back(world.netObjMan.make_obj_direct_with_specific_id<ResourceData>(netID, rData));
 }
 
-void ResourceManager::save_file(cereal::PortableBinaryOutputArchive& a) const {
+std::unordered_map<NetworkingObjects::NetObjID, ResourceData> ResourceManager::get_saved_resources() const {
     std::unordered_set<NetworkingObjects::NetObjID> usedResources;
     world.drawProg.get_used_resources(usedResources);
     std::unordered_map<NetworkingObjects::NetObjID, ResourceData> strippedResources;
@@ -207,7 +207,11 @@ void ResourceManager::save_file(cereal::PortableBinaryOutputArchive& a) const {
     std::erase_if(strippedResources, [&](const auto& p) {
         return !usedResources.contains(p.first);
     });
-    a(strippedResources);
+    return strippedResources;
+}
+
+void ResourceManager::save_file(cereal::PortableBinaryOutputArchive& a) const {
+    a(get_saved_resources());
 }
 
 void ResourceManager::clear_display_cache() {
