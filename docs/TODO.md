@@ -23,12 +23,13 @@ unchecked item in each update until Levi confirms it.
 ## Phase 1c (-9 plus extras)
 
 - [x] Build -11 tested: everything works (2026-10-21). Phase 1c done.
-- [ ] Keep the -11 folder (it's your app now). Delete older folders (-9 and before) after checking no drawings are inside.
+- [x] -11 replaced by -14.
 
 ## Move Everything To (layer panel)
 
 - [x] Build -13: Move Everything To works (2026-10-21), but long lists squished the panel.
-- [ ] Test build -14 (scroll bars, checklist in chat). Link: https://github.com/CreativeKidofGod/infinipaint/actions/runs/39559531996/artifacts/12328922267 (expires 2026-11-20).
+- [x] Build -14 tested: scroll bars work, everything works (2026-10-21).
+- [ ] Keep the -14 folder (it's your app now). Delete -13, -11 and older after checking no drawings are inside.
 - [ ] For the canvas that got the four extra layers: either close without saving, or move/delete as you like, then save.
 
 ## Standing reminders
