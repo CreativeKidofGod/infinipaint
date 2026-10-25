@@ -39,7 +39,7 @@ unchecked item in each update until Levi confirms it.
 
 ## Pen-friendly copy
 
-- [ ] Test the pen-friendly copy build (checklist in chat).
+- [ ] Test build -16 (pen-friendly copy, checklist in chat). Link: https://github.com/CreativeKidofGod/infinipaint/actions/runs/40160772742/artifacts/12586527571 (expires 2026-11-24).
 
 ## Standing reminders
 
