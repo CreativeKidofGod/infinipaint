@@ -29,21 +29,20 @@ unchecked item in each update until Levi confirms it.
 
 - [x] Build -13: Move Everything To works (2026-10-21), but long lists squished the panel.
 - [x] Build -14 tested: scroll bars work, everything works (2026-10-21).
-- [ ] Keep the -14 folder (it's your app now). Delete -13, -11 and older after checking no drawings are inside.
+- [x] -14 replaced by -15.
 - [ ] For the canvas that got the four extra layers: either close without saving, or move/delete as you like, then save.
 
 ## Phase 2 (keeping work safe)
 
-- [ ] Test build -15 (6-step checklist in chat). Link: https://github.com/CreativeKidofGod/infinipaint/actions/runs/39566341316/artifacts/12331242297 (expires 2026-11-20).
+- [x] Build -15 tested: autosave, canvas folder, backups and Open Copy all work (2026-10-24). Phase 2 done.
+- [ ] Keep the -15 folder (it's your app now). Delete -14 and older after checking no drawings are inside.
 
 ## Standing reminders
 
-- Until -15 is tested: the app keeps settings inside its folder. Don't save
-  canvases inside the app folder. (Fixed in -15.)
-- With -15: autosave saves every minute. For a canvas you want to keep
+- Autosave saves every minute. For a canvas you want to keep
   untouched (e.g. for the official app), use Save As with a new name first.
 - Keep canvases outside OneDrive. Documents and Desktop on this PC sync to
   OneDrive, so don't save canvases there.
 - The official InfiniPaint is also installed. Double-clicking a canvas opens
   the official app, not the custom one. Open canvases from inside the custom
-  app. (Phase 2 should handle this.)
+  app. (Could become a setting later.)

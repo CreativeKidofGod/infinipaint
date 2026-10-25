@@ -128,7 +128,7 @@ choices stay true to what Levi asked for.
 - Artifact downloads expire after 30 days; the copy on Levi's PC never does. For a permanent download of a good
   build, push a tag like v0.6.1-custom.9 (publishes a GitHub Release, public).
 
-## Phase 2: keeping work safe (built 2026-10-21, build -15, waiting for Levi's test)
+## Phase 2: keeping work safe (done, confirmed by Levi on build -15, 2026-10-24)
 
 - **Autosave every minute** while there are unsaved changes (counting starts at the first change). Canvases with a
   file save over it; new canvases save into the canvas folder under their tab name. Autosave is quiet (no popup).
