@@ -54,6 +54,7 @@ void EditTool::gui_toolbox(Toolbar& t) {
     else {
         gui.new_id("edit tool", [&] {
             text_label_centered(gui, "Edit");
+            drawP.pen_paste_buttons_gui();
         });
     }
 }

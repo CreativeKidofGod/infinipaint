@@ -152,3 +152,7 @@ bool TextBoxCanvasComponent::collides_within_coords_skpath(const SkPath& checkAg
 SCollision::AABB<float> TextBoxCanvasComponent::get_obj_coord_bounds() const {
     return {d.p1, d.p2};
 }
+
+std::string TextBoxCanvasComponent::get_plain_text() const {
+    return textBox ? textBox->get_rich_text_data().get_plain_text() : std::string();
+}

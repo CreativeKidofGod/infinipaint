@@ -115,6 +115,8 @@ class DrawingProgram {
         void clear_right_click_popup();
 
         void paste_object_clipboard(const Vector2f& pos);
+        // Custom fork: pen-friendly buttons ("Paste", "Paste Image", "Open Menu") for tool panels
+        void pen_paste_buttons_gui();
 
         std::unique_ptr<DrawingProgramToolBase> drawTool;
     private:
@@ -125,6 +127,7 @@ class DrawingProgram {
         void update_downloading_dropped_files();
 
         void selection_action_menu(Vector2f popupPos);
+        void selection_quick_bar_gui(); // Custom fork: tappable buttons next to a selection
         void right_click_action_menu(Vector2f popupPos, const std::function<void()>& innerContent);
         void popup_menu_action_button(const char* id, const char* text, const std::function<void()>& onClick);
         void rebuild_cache();

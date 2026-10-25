@@ -283,6 +283,8 @@ struct InputManager {
     void update_safe_area();
 
     void set_clipboard_str(std::string_view s);
+    // Custom fork: put a picture on the system clipboard so it pastes into other apps (PNG keeps transparency, BMP for older apps)
+    void set_clipboard_image(std::string png, std::string bmp);
     void set_clipboard_plain_and_richtext_pair(const std::pair<std::string, RichText::TextData>& plainAndRichtextPair);
     std::string get_clipboard_str_SDL();
     void get_clipboard_image_data_SDL(const std::function<void(std::string_view data)>& callback);

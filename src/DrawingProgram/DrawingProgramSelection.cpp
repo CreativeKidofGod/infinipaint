@@ -32,6 +32,11 @@
 #endif
 #include <include/effects/SkImageFilters.h>
 #include <include/core/SkPathBuilder.h>
+#include "../WorldScreenshot.hpp"
+#include "../CanvasComponents/TextBoxCanvasComponent.hpp"
+#include <include/core/SkStream.h>
+#include <include/core/SkData.h>
+#include <include/encode/SkPngEncoder.h>
 #include <ranges>
 
 #define ROTATION_POINT_RADIUS_MULTIPLIER 0.7f
@@ -57,6 +62,7 @@ void DrawingProgramSelection::selection_gui(Toolbar& t) {
     auto& gui = drawP.world.main.g.gui;
 
     gui.new_id("general selection gui", [&] {
+        drawP.pen_paste_buttons_gui();
         text_label(gui, "Select From:");
         radio_button_selector(gui, "layer selector", &drawP.controls.layerSelector, {
             {"Layer Being Edited", DrawingProgramLayerManager::LayerSelector::LAYER_BEING_EDITED},
@@ -804,6 +810,118 @@ void DrawingProgramSelection::move_selection_to_layer(DrawingProgramLayerListIte
     newSelection.insert(newSelection.end(), movedComps.begin(), movedComps.end());
     drawP.layerMan.switch_editing_layer_to(targetLayer);
     set_to_selection(newSelection);
+}
+
+std::optional<SCollision::AABB<float>> DrawingProgramSelection::get_screen_bounds() {
+    if(!is_something_selected())
+        return std::nullopt;
+    rebuild_cam_space();
+    if(camSpaceSelection.triangle.empty())
+        return std::nullopt;
+    SCollision::AABB<float> bounds{camSpaceSelection.triangle[0].p[0], camSpaceSelection.triangle[0].p[0]};
+    for(auto& t : camSpaceSelection.triangle)
+        for(auto& p : t.p)
+            bounds.include_point_in_bounds(p);
+    return bounds;
+}
+
+bool DrawingProgramSelection::selection_has_text() {
+    for(auto& c : selectedSet) {
+        if(c->obj->get_comp().get_type() == CanvasComponentType::TEXTBOX)
+            return true;
+    }
+    return false;
+}
+
+void DrawingProgramSelection::copy_selection_text() {
+    check_add_stroke_color_change_undo();
+    std::string text;
+    for(auto& c : selectedSet) { // Bottom to top, like reading the layers
+        if(c->obj->get_comp().get_type() != CanvasComponentType::TEXTBOX)
+            continue;
+        std::string boxText = static_cast<TextBoxCanvasComponent&>(c->obj->get_comp()).get_plain_text();
+        if(boxText.empty())
+            continue;
+        if(!text.empty())
+            text += "\n\n";
+        text += boxText;
+    }
+    if(text.empty()) {
+        Logger::get().log(Logger::LogType::USERINFO, "No text selected");
+        return;
+    }
+    drawP.world.main.input.set_clipboard_str(text);
+    Logger::get().log(Logger::LogType::USERINFO, "Text copied. Paste it in any app.");
+}
+
+void DrawingProgramSelection::copy_selection_as_image() {
+    check_add_stroke_color_change_undo();
+    if(!is_something_selected())
+        return;
+    commit_transform_selection();
+    auto boundsOpt = get_screen_bounds();
+    if(!boundsOpt)
+        return;
+    SCollision::AABB<float> bounds = boundsOpt.value();
+    constexpr float PADDING = 4.0f;
+    bounds.min -= Vector2f{PADDING, PADDING};
+    bounds.max += Vector2f{PADDING, PADDING};
+    Vector2f dim = bounds.dim();
+    if(dim.x() <= 0.0f || dim.y() <= 0.0f)
+        return;
+    // Twice the screen sharpness, but never bigger than 4096 pixels on a side
+    constexpr float MAX_SIDE = 4096.0f;
+    float scale = std::min(2.0f, MAX_SIDE / std::max(dim.x(), dim.y()));
+    Vector2i size{std::max(1, (int)std::ceil(dim.x() * scale)), std::max(1, (int)std::ceil(dim.y() * scale))};
+
+    std::vector<CanvasComponentContainer::ObjInfo*> toDraw = selectedSet;
+    auto pixels = world_render_region_rgba(drawP.world.main.world, drawP.world.drawData.cam.c, bounds, size, [&](SkCanvas* canvas, const DrawData& drawData) {
+        for(auto& c : toDraw)
+            c->obj->draw(canvas, drawData);
+    });
+    if(!pixels) {
+        Logger::get().log(Logger::LogType::WORLDFATAL, "Couldn't make a picture of the selection");
+        return;
+    }
+
+    SkImageInfo info = SkImageInfo::Make(size.x(), size.y(), kRGBA_8888_SkColorType, kPremul_SkAlphaType);
+    SkPixmap pixmap(info, pixels->data(), (size_t)size.x() * 4);
+    SkDynamicMemoryWStream pngOut;
+    if(!SkPngEncoder::Encode(&pngOut, pixmap, {})) {
+        Logger::get().log(Logger::LogType::WORLDFATAL, "Couldn't make a picture of the selection");
+        return;
+    }
+    sk_sp<SkData> pngData = pngOut.detachAsData();
+    std::string png(static_cast<const char*>(pngData->data()), pngData->size());
+
+    // BMP for apps that don't read PNG from the clipboard: 24-bit, on a white background, bottom row first
+    size_t rowSize = ((size_t)size.x() * 3 + 3) & ~(size_t)3;
+    size_t pixelBytes = rowSize * (size_t)size.y();
+    std::string bmp(14 + 40 + pixelBytes, '\0');
+    auto put16 = [&](size_t at, uint16_t v) { bmp[at] = char(v & 0xFF); bmp[at + 1] = char(v >> 8); };
+    auto put32 = [&](size_t at, uint32_t v) { for(int i = 0; i < 4; i++) bmp[at + i] = char((v >> (8 * i)) & 0xFF); };
+    bmp[0] = 'B'; bmp[1] = 'M';
+    put32(2, (uint32_t)bmp.size());
+    put32(10, 14 + 40);
+    put32(14, 40);
+    put32(18, (uint32_t)size.x());
+    put32(22, (uint32_t)size.y());
+    put16(26, 1);
+    put16(28, 24);
+    put32(34, (uint32_t)pixelBytes);
+    for(int y = 0; y < size.y(); y++) {
+        const uint8_t* src = pixels->data() + (size_t)y * size.x() * 4;
+        char* dst = bmp.data() + 54 + (size_t)(size.y() - 1 - y) * rowSize;
+        for(int x = 0; x < size.x(); x++) {
+            uint8_t r = src[x * 4], g = src[x * 4 + 1], b = src[x * 4 + 2], a = src[x * 4 + 3];
+            dst[x * 3]     = char(b + (255 - a)); // Premultiplied over white
+            dst[x * 3 + 1] = char(g + (255 - a));
+            dst[x * 3 + 2] = char(r + (255 - a));
+        }
+    }
+
+    drawP.world.main.input.set_clipboard_image(std::move(png), std::move(bmp));
+    Logger::get().log(Logger::LogType::USERINFO, "Picture copied. Paste it in any app.");
 }
 
 void DrawingProgramSelection::erase_component(CanvasComponentContainer::ObjInfo* objToCheck) {

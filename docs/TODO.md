@@ -37,6 +37,10 @@ unchecked item in each update until Levi confirms it.
 - [x] Build -15 tested: autosave, canvas folder, backups and Open Copy all work (2026-10-24). Phase 2 done.
 - [ ] Keep the -15 folder (it's your app now). Delete -14 and older after checking no drawings are inside.
 
+## Pen-friendly copy
+
+- [ ] Test the pen-friendly copy build (checklist in chat).
+
 ## Standing reminders
 
 - Autosave saves every minute. For a canvas you want to keep

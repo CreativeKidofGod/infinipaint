@@ -498,6 +498,108 @@ void DrawingProgram::right_click_popup_gui(Toolbar& t) {
         move_confirm_popup_gui();
     else if(rightClickPopupLocation.has_value())
         drawTool->right_click_popup_gui(t, rightClickPopupLocation.value());
+    else
+        selection_quick_bar_gui();
+}
+
+void DrawingProgram::selection_quick_bar_gui() {
+    using namespace GUIStuff;
+    using namespace ElementHelpers;
+
+    if(!selection.is_something_selected() || selection.is_being_transformed() || !is_selection_allowing_tool(drawTool->get_type()))
+        return;
+    auto bounds = selection.get_screen_bounds();
+    if(!bounds)
+        return;
+
+    GUIStuff::GUIManager& gui = world.main.g.gui;
+    float guiScale = world.main.g.final_gui_scale();
+    constexpr float BAR_HEIGHT = 44.0f;
+    constexpr float GAP = 8.0f;
+    Vector2f barPos{bounds->min.x() / guiScale, bounds->min.y() / guiScale - BAR_HEIGHT - GAP};
+    if(barPos.y() < 60.0f) // Not enough room above (under the tab bar): put it below the selection
+        barPos.y() = bounds->max.y() / guiScale + GAP;
+    barPos.x() = std::max(barPos.x(), 60.0f); // Keep it clear of the tool bar on the left
+
+    gui.set_z_index(-1, [&] {
+        gui.element<PositionAdjustingPopupMenu>("Selection quick bar", barPos, [&] {
+            CLAY_AUTO_ID({
+                .layout = {
+                    .sizing = {.width = CLAY_SIZING_FIT(0), .height = CLAY_SIZING_FIT(0)},
+                    .padding = CLAY_PADDING_ALL(gui.io.theme->padding1),
+                    .childGap = gui.io.theme->childGap1,
+                    .childAlignment = { .x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_CENTER},
+                    .layoutDirection = CLAY_LEFT_TO_RIGHT
+                },
+                .backgroundColor = convert_vec4<Clay_Color>(gui.io.theme->backColor1),
+                .cornerRadius = CLAY_CORNER_RADIUS(gui.io.theme->windowCorners1)
+            }) {
+                text_button(gui, "quick copy image", "Copy Image", {
+                    .onClick = [&] {
+                        selection.copy_selection_as_image();
+                    }
+                });
+                if(selection.selection_has_text()) {
+                    text_button(gui, "quick copy text", "Copy Text", {
+                        .onClick = [&] {
+                            selection.copy_selection_text();
+                        }
+                    });
+                }
+                text_button(gui, "quick copy", "Copy", {
+                    .onClick = [&] {
+                        selection.selection_to_clipboard();
+                        Logger::get().log(Logger::LogType::USERINFO, "Copied inside InfiniPaint. Use Copy Image to paste in other apps.");
+                    }
+                });
+                text_button(gui, "quick cut", "Cut", {
+                    .onClick = [&] {
+                        selection.selection_to_clipboard();
+                        selection.delete_all();
+                    }
+                });
+                text_button(gui, "quick delete", "Delete", {
+                    .onClick = [&] {
+                        selection.delete_all();
+                    }
+                });
+                text_button(gui, "quick more", "More...", {
+                    .onClick = [&, barPos] {
+                        set_right_click_popup_location(barPos + Vector2f{0.0f, BAR_HEIGHT + GAP}); // Same menu a right-click opens
+                    }
+                });
+            }
+        }, LayoutElement::Callbacks{});
+    });
+}
+
+void DrawingProgram::pen_paste_buttons_gui() {
+    using namespace GUIStuff;
+    using namespace ElementHelpers;
+
+    GUIStuff::GUIManager& gui = world.main.g.gui;
+    Vector2f screenCenter = world.main.window.size.cast<float>() * 0.5f;
+    text_label_light(gui, "Pen Shortcuts");
+    left_to_right_line_layout(gui, [&]() {
+        text_button(gui, "pen paste", "Paste", {
+            .onClick = [&, screenCenter] {
+                paste_object_clipboard(screenCenter);
+            }
+        });
+        text_button(gui, "pen paste image", "Paste Image", {
+            .onClick = [&, screenCenter] {
+                selection.deselect_all();
+                world.main.input.call_paste(CustomEvents::PasteEvent::DataType::IMAGE, {
+                    .pastePosition = screenCenter
+                });
+            }
+        });
+        text_button(gui, "pen open menu", "Open Menu", {
+            .onClick = [&, screenCenter] {
+                set_right_click_popup_location(screenCenter / world.main.g.final_gui_scale()); // Same menu a right-click opens
+            }
+        });
+    });
 }
 
 void DrawingProgram::set_right_click_popup_location(const Vector2f& newLoc) {

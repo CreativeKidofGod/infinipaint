@@ -148,6 +148,20 @@ choices stay true to what Levi asked for.
   them into that file within a minute. Use Save As first for files that must stay untouched.
 - Not done here (later): double-clicking a canvas opens the official app (file association) - can be a setting later.
 
+## Pen-friendly copy (Levi, 2026-10-25, done before Phase 3)
+
+- Why: Levi uses a pen and had to fold/unfold his laptop for keys/touchpad. His pen has no right-click button
+  (only pan and erase buttons), so everything must be tappable.
+- **Floating bar next to any selection** (lasso, rectangle select, arrow tool): Copy Image, Copy Text (only when text
+  boxes are selected), Copy, Cut, Delete, More... ("More..." opens the same menu a right-click opens: Paste, Move To
+  layers, Bring To Front, etc.).
+- **Copy Image** puts a picture of just the selected things (not what's behind them) on the Windows clipboard as PNG
+  (keeps transparency) and BMP on white (for older apps). Twice screen sharpness, max 4096 px per side.
+- **Copy Text** puts the selected text boxes' plain text on the clipboard.
+- **"Pen Shortcuts" in the arrow, rectangle-select and lasso panels:** Paste (InfiniPaint copy), Paste Image (from
+  other apps), Open Menu (the right-click menu, at the screen center).
+- Copy As PDF stays with Phase 4; Copy Video with Phase 10.
+
 ## Planned features (in order)
 
 1. **Layers**

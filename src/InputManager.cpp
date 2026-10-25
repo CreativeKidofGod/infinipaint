@@ -297,6 +297,35 @@ void InputManager::set_clipboard_str(std::string_view s) {
 #endif
 }
 
+void InputManager::set_clipboard_image(std::string png, std::string bmp) {
+#ifndef __EMSCRIPTEN__
+    struct ClipboardImage {
+        std::string png;
+        std::string bmp;
+    };
+    // SDL asks for the data later (when another app pastes), so it has to stay alive until SDL's cleanup call
+    ClipboardImage* data = new ClipboardImage{std::move(png), std::move(bmp)};
+    static const char* mimeTypes[] = {"image/png", "image/bmp"};
+    SDL_SetClipboardData([](void* userdata, const char* mimeType, size_t* size) -> const void* {
+        ClipboardImage* d = static_cast<ClipboardImage*>(userdata);
+        const std::string* chosen = nullptr;
+        if(std::string_view(mimeType) == "image/png")
+            chosen = &d->png;
+        else if(std::string_view(mimeType) == "image/bmp")
+            chosen = &d->bmp;
+        if(!chosen || chosen->empty()) {
+            *size = 0;
+            return nullptr;
+        }
+        *size = chosen->size();
+        return chosen->data();
+    }, [](void* userdata) {
+        delete static_cast<ClipboardImage*>(userdata);
+    }, data, mimeTypes, 2);
+    lastCopiedRichText = std::nullopt;
+#endif
+}
+
 void InputManager::set_clipboard_plain_and_richtext_pair(const std::pair<std::string, RichText::TextData>& plainAndRichtextPair) {
     set_clipboard_str(plainAndRichtextPair.first);
     lastCopiedRichText = plainAndRichtextPair.second;

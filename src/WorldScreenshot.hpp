@@ -17,9 +17,16 @@
  */
 
 #pragma once
+#include <functional>
+#include <optional>
+#include <vector>
 #include <filesystem>
 #include "CoordSpaceHelper.hpp"
 #include <Helpers/SCollision.hpp>
+
+class SkCanvas;
+struct DrawData;
+class World;
 
 struct WorldScreenshotInfo {
     enum class ScreenshotType : size_t {
@@ -46,5 +53,8 @@ NLOHMANN_JSON_SERIALIZE_ENUM(WorldScreenshotInfo::ScreenshotType, {
 })
 
 void world_take_screenshot(const std::shared_ptr<World>& w, const WorldScreenshotInfo& info);
+// Custom fork: renders a screen-space region (in cameraCoords) to premultiplied RGBA pixels, drawing only what drawFunc draws
+// on a transparent background. Returns nothing on failure.
+std::optional<std::vector<uint8_t>> world_render_region_rgba(const std::shared_ptr<World>& w, const CoordSpaceHelper& cameraCoords, const SCollision::AABB<float>& imageBounds, const Vector2i& imageSizePixels, const std::function<void(SkCanvas*, const DrawData&)>& drawFunc);
 std::string world_screenshot_info_get_extension_from_type(WorldScreenshotInfo::ScreenshotType t);
 std::string world_screenshot_info_get_mime_from_type(WorldScreenshotInfo::ScreenshotType t);

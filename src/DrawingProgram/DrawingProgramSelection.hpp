@@ -50,6 +50,11 @@ class DrawingProgramSelection {
         void push_selection_to_back();
         void delete_all();
         void move_selection_to_layer(DrawingProgramLayerListItem* targetLayer);
+        // Custom fork: pen-friendly copy to other apps
+        std::optional<SCollision::AABB<float>> get_screen_bounds();
+        bool selection_has_text();
+        void copy_selection_as_image(); // Picture of just the selected things, on the system clipboard
+        void copy_selection_text();     // Text of selected text boxes, on the system clipboard
         void selection_to_clipboard();
         CanvasComponentContainer::ObjInfo* get_front_object_colliding_with_in_editing_layer(const SkPath& cC);
         void input_key_callback_modify_selection(const InputManager::KeyCallbackArgs& key);

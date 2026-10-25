@@ -50,7 +50,27 @@
 #endif
 
 void take_screenshot_svg(const std::shared_ptr<World>& w, SkCanvas* canvas, bool transparentBackground, const CoordSpaceHelper& cameraCoords, const SCollision::AABB<float>& imageBounds);
-void take_screenshot_area_hw(const std::shared_ptr<World>& w, const sk_sp<SkSurface>& surface, SkCanvas* canvas, void* fullImgRawData, const Vector2i& fullImageSize, const Vector2i& sectionImagePos, const Vector2i& sectionImageSize, const Vector2i& canvasSize, bool transparentBackground, const CoordSpaceHelper& cameraCoords, const SCollision::AABB<float>& imageBounds, bool displayGrid);
+void take_screenshot_area_hw(const std::shared_ptr<World>& w, const sk_sp<SkSurface>& surface, SkCanvas* canvas, void* fullImgRawData, const Vector2i& fullImageSize, const Vector2i& sectionImagePos, const Vector2i& sectionImageSize, const Vector2i& canvasSize, bool transparentBackground, const CoordSpaceHelper& cameraCoords, const SCollision::AABB<float>& imageBounds, bool displayGrid, const std::function<void(SkCanvas*, const DrawData&)>& drawFunc = nullptr);
+
+std::optional<std::vector<uint8_t>> world_render_region_rgba(const std::shared_ptr<World>& w, const CoordSpaceHelper& cameraCoords, const SCollision::AABB<float>& imageBounds, const Vector2i& imageSizePixels, const std::function<void(SkCanvas*, const DrawData&)>& drawFunc) {
+    if(imageSizePixels.x() <= 0 || imageSizePixels.y() <= 0)
+        return std::nullopt;
+    try {
+        std::vector<uint8_t> rawData((size_t)imageSizePixels.x() * (size_t)imageSizePixels.y() * 4);
+        sk_sp<SkSurface> surface = w->main.create_native_surface(w->main.window.size, true);
+        SkCanvas* canvas = surface ? surface->getCanvas() : nullptr;
+        if(!canvas)
+            return std::nullopt;
+        for(int i = 0; i < imageSizePixels.x(); i += w->main.window.size.x())
+            for(int j = 0; j < imageSizePixels.y(); j += w->main.window.size.y())
+                take_screenshot_area_hw(w, surface, canvas, rawData.data(), imageSizePixels, Vector2i{i, j}, Vector2i{std::min(w->main.window.size.x(), imageSizePixels.x() - i), std::min(w->main.window.size.y(), imageSizePixels.y() - j)}, w->main.window.size, true, cameraCoords, imageBounds, false, drawFunc);
+        return rawData;
+    }
+    catch(const std::exception& e) {
+        Logger::get().log(Logger::LogType::INFO, std::string("[world_render_region_rgba] ") + e.what());
+        return std::nullopt;
+    }
+}
 
 void world_take_screenshot(const std::shared_ptr<World>& w, const WorldScreenshotInfo& info) {
     if(info.imageSizePixels.x() <= 0 || info.imageSizePixels.y() <= 0) {
@@ -196,7 +216,7 @@ void take_screenshot_svg(const std::shared_ptr<World>& w, SkCanvas* canvas, bool
     w->main.draw_world(canvas, w->main.world, screenshotDrawData);
 }
 
-void take_screenshot_area_hw(const std::shared_ptr<World>& w, const sk_sp<SkSurface>& surface, SkCanvas* canvas, void* fullImgRawData, const Vector2i& fullImageSize, const Vector2i& sectionImagePos, const Vector2i& sectionImageSize, const Vector2i& canvasSize, bool transparentBackground, const CoordSpaceHelper& cameraCoords, const SCollision::AABB<float>& imageBounds, bool displayGrid) {
+void take_screenshot_area_hw(const std::shared_ptr<World>& w, const sk_sp<SkSurface>& surface, SkCanvas* canvas, void* fullImgRawData, const Vector2i& fullImageSize, const Vector2i& sectionImagePos, const Vector2i& sectionImageSize, const Vector2i& canvasSize, bool transparentBackground, const CoordSpaceHelper& cameraCoords, const SCollision::AABB<float>& imageBounds, bool displayGrid, const std::function<void(SkCanvas*, const DrawData&)>& drawFunc) {
     float secRectX1 = imageBounds.min.x() + (imageBounds.max.x() - imageBounds.min.x()) * (sectionImagePos.x() / (double)fullImageSize.x());
     float secRectX2 = imageBounds.min.x() + (imageBounds.max.x() - imageBounds.min.x()) * ((sectionImagePos.x() + canvasSize.x()) / (double)fullImageSize.x());
     float secRectY1 = imageBounds.min.y() + (imageBounds.max.y() - imageBounds.min.y()) * (sectionImagePos.y() / (double)fullImageSize.y());
@@ -222,7 +242,12 @@ void take_screenshot_area_hw(const std::shared_ptr<World>& w, const sk_sp<SkSurf
     screenshotDrawData.transparentBackground = transparentBackground;
     screenshotDrawData.drawGrids = displayGrid;
     screenshotDrawData.refresh_draw_optimizing_values();
-    w->main.draw_world(canvas, w, screenshotDrawData);
+    if(drawFunc) {
+        canvas->clear(SK_ColorTRANSPARENT);
+        drawFunc(canvas, screenshotDrawData);
+    }
+    else
+        w->main.draw_world(canvas, w, screenshotDrawData);
 
     SkImageInfo aaImgInfo = SkImageInfo::Make(sectionImageSize.x(), sectionImageSize.y(), kRGBA_8888_SkColorType, kPremul_SkAlphaType);
     void* fullImgRawDataStartPt = (uint8_t*)fullImgRawData + 4 * (size_t)sectionImagePos.x() + 4 * (size_t)fullImageSize.x() * (size_t)sectionImagePos.y();

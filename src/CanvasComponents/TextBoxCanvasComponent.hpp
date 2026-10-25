@@ -36,6 +36,7 @@ class TextBoxCanvasComponent : public CanvasComponent {
         std::unique_ptr<CanvasComponent> get_data_copy() const override;
         virtual void set_data_from(const CanvasComponent& other) override;
         void set_initial_text_color(const Vector4f& initialColor);
+        std::string get_plain_text() const; // Custom fork: for "Copy Text"
 
         // User input data
         struct Data {
