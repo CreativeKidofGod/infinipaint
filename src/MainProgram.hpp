@@ -132,6 +132,7 @@ class MainProgram {
         bool net_server_hosted();
         void update_display_names();
         void setup_canvas_folder();
+        void apply_canvas_protection(); // Also called when the setting or the canvas folder changes
 
         void save_config();
         void load_config();

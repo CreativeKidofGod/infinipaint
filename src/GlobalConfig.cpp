@@ -77,6 +77,11 @@ nlohmann::json GlobalConfig::get_config_json(const InputManager& input) const {
         std::u8string canvasFolderU8 = canvasFolder.u8string();
         toRet["canvasFolder"] = std::string(canvasFolderU8.begin(), canvasFolderU8.end());
     }
+    toRet["protectCanvases"] = protectCanvases;
+    {
+        std::u8string protectedFolderU8 = protectedFolder.u8string();
+        toRet["protectedFolder"] = std::string(protectedFolderU8.begin(), protectedFolderU8.end());
+    }
     toRet["themeInUse"] = themeCurrentlyLoaded;
     toRet["defaultCanvasBackgroundColor"] = defaultCanvasBackgroundColor;
     toRet["flipZoomToolDirection"] = flipZoomToolDirection;
@@ -159,6 +164,12 @@ void GlobalConfig::set_config_json(InputManager& input, const nlohmann::json& j,
         std::string canvasFolderStr;
         j.at("canvasFolder").get_to(canvasFolderStr);
         canvasFolder = std::filesystem::path(std::u8string(canvasFolderStr.begin(), canvasFolderStr.end()));
+    } catch(...) {}
+    try{j.at("protectCanvases").get_to(protectCanvases);} catch(...) {}
+    try{
+        std::string protectedFolderStr;
+        j.at("protectedFolder").get_to(protectedFolderStr);
+        protectedFolder = std::filesystem::path(std::u8string(protectedFolderStr.begin(), protectedFolderStr.end()));
     } catch(...) {}
     try{j.at("themeInUse").get_to(themeCurrentlyLoaded);} catch(...) {}
     if(version >= VersionNumber(0, 3, 0))

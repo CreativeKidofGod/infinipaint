@@ -169,7 +169,8 @@ class Toolbar {
             CANVAS_SETTINGS_MENU,
             SET_DOWNLOAD_NAME,
             ABOUT_MENU,
-            BACKUPS_MENU
+            BACKUPS_MENU,
+            DELETE_CANVAS_MENU
         } optionsMenuType;
         enum GeneralSettingsOptions {
             GSETTINGS_GENERAL = 0,

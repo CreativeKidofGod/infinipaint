@@ -22,6 +22,7 @@
 #include "FileHelpers.hpp"
 #include "GUIStuff/ElementHelpers/CheckBoxHelpers.hpp"
 #include "GUIStuff/ElementHelpers/LayoutHelpers.hpp"
+#include "CanvasProtection.hpp"
 #include "GUIStuff/ElementHelpers/PopupHelpers.hpp"
 #include "GUIStuff/ElementHelpers/RadioButtonHelpers.hpp"
 #include "GUIStuff/Elements/ManyElementScrollArea.hpp"
@@ -588,6 +589,12 @@ void Toolbar::top_toolbar() {
                                 optionsMenuType = GENERAL_SETTINGS_MENU;
                             });
                             #ifndef __EMSCRIPTEN__
+                                if(main.world && !main.world->filePath.empty() && !main.world->netClient) {
+                                    menu_popup_text_button("delete canvas menu button", "Delete This Canvas", [&] {
+                                        optionsMenuOpen = true;
+                                        optionsMenuType = DELETE_CANVAS_MENU;
+                                    });
+                                }
                                 menu_popup_text_button("backups menu button", "Backups", [&] {
                                     backupsList = CanvasBackups::list_all(main.conf.configPath);
                                     optionsMenuOpen = true;
@@ -1433,6 +1440,35 @@ void Toolbar::options_menu() {
             });
             break;
         }
+        case DELETE_CANVAS_MENU: {
+            center_obstructing_window_gui("delete canvas menu", CLAY_SIZING_FIXED(500), CLAY_SIZING_FIT(0), [&] {
+                if(!main.world || main.world->filePath.empty()) {
+                    text_label(gui, "This canvas isn't saved as a file, so there's nothing to delete.");
+                    text_button_wide("delete canvas done", "Done", [&] { optionsMenuOpen = false; });
+                    return;
+                }
+                text_label_centered(gui, "Delete This Canvas?");
+                text_label(gui, "\"" + main.world->name + "\" will close and go to the Recycle Bin, so you can still get it back from there.");
+                text_label_light(gui, "Its backups stay in Menu > Backups.");
+                text_label_light(gui, main.world->filePath.string());
+                text_button_wide("confirm delete canvas", "Yes, Delete It", [&] {
+                    optionsMenuOpen = false;
+                    World* w = main.world.get();
+                    std::filesystem::path toDelete = w->filePath;
+                    w->autosaveBlocked = true; // So it can't be saved again while closing
+                    main.set_tab_to_close(w);
+                    std::string error;
+                    if(CanvasProtection::move_to_recycle_bin(toDelete, error))
+                        Logger::get().log(Logger::LogType::USERINFO, "Canvas moved to the Recycle Bin");
+                    else
+                        Logger::get().log(Logger::LogType::WORLDFATAL, "Couldn't delete the canvas: " + error);
+                });
+                text_button_wide("cancel delete canvas", "Cancel", [&] {
+                    optionsMenuOpen = false;
+                });
+            });
+            break;
+        }
         case BACKUPS_MENU: {
             center_obstructing_window_gui("backups menu", CLAY_SIZING_FIXED(650), CLAY_SIZING_FIT(0, 550), [&] {
                 backups_menu_inner_gui();
@@ -1527,6 +1563,10 @@ void Toolbar::general_settings_inner_gui() {
                             });
                             if(GlobalConfig::path_looks_like_onedrive(main.conf.canvasFolder))
                                 text_label(gui, "Warning: this folder syncs to OneDrive. Big canvases will upload over and over and can get sync conflicts.");
+                            checkbox_boolean_field(gui, "protect canvases", "Protect Canvases From Deletion", &main.conf.protectCanvases, [&] {
+                                main.apply_canvas_protection();
+                            });
+                            text_label_light(gui, "When on, File Explorer can't delete, move or rename canvases in the canvas folder. Use Menu > Delete This Canvas instead. Changing the canvas folder applies after a restart.");
                             checkbox_boolean_field(gui, "native file pick", "Use Native File Picker", &main.conf.useNativeFilePicker);
                             checkbox_boolean_field(gui, "update notifications enable", "Check For Updates On Startup", &main.conf.checkForUpdates);
                         #endif
@@ -1855,6 +1895,8 @@ void Toolbar::backups_menu_inner_gui() {
                                         return;
                                     }
                                     optionsMenuOpen = false;
+                                    if(main.conf.protectCanvases && CanvasProtection::is_in_folder(restored.value(), main.conf.canvasFolder))
+                                        CanvasProtection::protect_file(restored.value());
                                     CustomEvents::emit_event<CustomEvents::OpenInfiniPaintFileEvent>({
                                         .isClient = false,
                                         .filePathSource = restored.value()

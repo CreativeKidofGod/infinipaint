@@ -52,6 +52,7 @@
 #include "WorldScreenshot.hpp"
 #include "FileHelpers.hpp"
 #include "CanvasBackups.hpp"
+#include "CanvasProtection.hpp"
 
 #ifdef __EMSCRIPTEN__
     #include <EmscriptenHelpers/emscripten_browser_file.h>
@@ -281,7 +282,7 @@ void World::update() {
 void World::autosave_update() {
 #ifndef __EMSCRIPTEN__
     constexpr auto AUTOSAVE_INTERVAL = std::chrono::minutes(1);
-    if(clientStillConnecting || netClient)
+    if(clientStillConnecting || netClient || autosaveBlocked)
         return;
     auto now = std::chrono::steady_clock::now();
     if(!hasUnsavedLocalChanges) {
@@ -556,8 +557,13 @@ void World::save_to_file(const std::filesystem::path& filePathToSaveAt, bool isA
                 throw std::runtime_error("SDL_SaveFile failed with error: " + std::string(SDL_GetError()));
             }
             {
+                // A protected canvas can't be replaced until its "deny Delete" rule is lifted (see CanvasProtection)
+                CanvasProtection::unprotect_file(filePath);
+                bool protectAfter = main.conf.protectCanvases && CanvasProtection::is_in_folder(filePath, main.conf.canvasFolder);
                 std::error_code renameEc;
                 std::filesystem::rename(tempPath, filePath, renameEc);
+                if(protectAfter)
+                    CanvasProtection::protect_file(filePath);
                 if(renameEc) {
                     std::error_code removeEc;
                     std::filesystem::remove(tempPath, removeEc);

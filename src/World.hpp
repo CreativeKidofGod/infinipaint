@@ -137,6 +137,7 @@ class World {
 
         // Custom fork: autosave a minute after changes start, and keep trying every minute
         void autosave_update();
+        bool autosaveBlocked = false; // Set while this canvas is being deleted
         std::chrono::steady_clock::time_point lastSaveOrAutosaveAttempt = std::chrono::steady_clock::now();
 
         void load_empty_canvas(const std::optional<std::filesystem::path>& filePathEmptyAutoSaveDir = std::nullopt);

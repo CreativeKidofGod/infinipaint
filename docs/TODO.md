@@ -41,6 +41,10 @@ unchecked item in each update until Levi confirms it.
 
 - [ ] Test build -16 (pen-friendly copy, checklist in chat). Link: https://github.com/CreativeKidofGod/infinipaint/actions/runs/40160772742/artifacts/12586527571 (expires 2026-11-24).
 
+## Phase 3 (delete protection)
+
+- [ ] Test the Phase 3 build (checklist in chat).
+
 ## Standing reminders
 
 - Autosave saves every minute. For a canvas you want to keep

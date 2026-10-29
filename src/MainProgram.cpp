@@ -22,6 +22,7 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
 #include <SDL3/SDL_filesystem.h>
+#include "CanvasProtection.hpp"
 #include <include/core/SkAlphaType.h>
 #include <include/core/SkColor.h>
 #include <include/core/SkPaint.h>
@@ -195,9 +196,23 @@ void MainProgram::setup_canvas_folder() {
     std::filesystem::create_directories(conf.canvasFolder, ec);
     if(ec)
         Logger::get().log(Logger::LogType::INFO, "Couldn't create canvas folder " + conf.canvasFolder.string() + ": " + ec.message());
+    apply_canvas_protection();
     // File picker starts in the canvas folder instead of the app folder
     if(conf.currentSearchPath.empty() || conf.currentSearchPath == homePath)
         conf.currentSearchPath = conf.canvasFolder;
+}
+
+void MainProgram::apply_canvas_protection() {
+    // If the canvas folder changed, the old one goes back to normal
+    std::error_code ec;
+    if(!conf.protectedFolder.empty() && (!conf.protectCanvases || !std::filesystem::equivalent(conf.protectedFolder, conf.canvasFolder, ec))) {
+        CanvasProtection::unprotect_all(conf.protectedFolder);
+        conf.protectedFolder.clear();
+    }
+    if(conf.protectCanvases && !conf.canvasFolder.empty()) {
+        CanvasProtection::protect_all(conf.canvasFolder);
+        conf.protectedFolder = conf.canvasFolder;
+    }
 }
 
 void MainProgram::update_display_names() {

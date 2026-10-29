@@ -33,6 +33,9 @@ class GlobalConfig {
         // Empty until set up at startup (default: <home>/InfiniPaint Canvases).
         std::filesystem::path canvasFolder;
         static bool path_looks_like_onedrive(const std::filesystem::path& p);
+        // Custom fork: stop File Explorer from deleting/moving canvases in the canvas folder
+        bool protectCanvases = true;
+        std::filesystem::path protectedFolder; // The folder protection was last applied to
 
         std::string ownLicenseText;
         std::vector<std::pair<std::string, std::string>> thirdPartyLicenses;

@@ -162,6 +162,20 @@ choices stay true to what Levi asked for.
   other apps), Open Menu (the right-click menu, at the screen center).
 - Copy As PDF stays with Phase 4; Copy Video with Phase 10.
 
+## Phase 3: delete protection (built 2026-10-29, waiting for Levi's test)
+
+- Only canvases (.infpnt) directly in the canvas folder are protected. Nothing else is touched.
+- How: each canvas gets a Windows "deny Delete" rule for Everyone, and the canvas folder a "deny Delete Child" rule
+  (Windows lets a file be deleted if either allows it). Other files in the folder keep their own Delete permission.
+  File Explorer can't delete (or send to the Recycle Bin), move or rename protected canvases. Copying still works.
+- The app lifts a file's rule right before replacing it when saving, then puts it back, so saving/autosave work.
+  Saving any file first lifts the rule, so canvases left protected in an old folder still save.
+- Menu > "Delete This Canvas": "Are you sure?", closes the tab and sends the file to the Recycle Bin (recoverable).
+  Its backups stay in Menu > Backups.
+- Settings > General > "Protect Canvases From Deletion" (on by default). Turning it off removes all the rules.
+  Changing the canvas folder moves protection to the new folder on the next start.
+- An administrator can still force-delete (take ownership). That's fine: this protects against accidents.
+
 ## Planned features (in order)
 
 1. **Layers**
