@@ -43,7 +43,7 @@ unchecked item in each update until Levi confirms it.
 
 ## Phase 3 (delete protection)
 
-- [ ] Test the Phase 3 build (checklist in chat).
+- [ ] Test build -19 (delete protection, checklist in chat). Link: https://github.com/CreativeKidofGod/infinipaint/actions/runs/40806075357/artifacts/12868609918 (expires 2026-11-28). It also includes pen-friendly copy (-16).
 
 ## Standing reminders
 
