@@ -85,6 +85,7 @@ class World {
         bool clientStillConnecting = false;
 
         void autosave_to_directory(const std::filesystem::path& directoryToSaveAt, bool isAutosave = false);
+        bool autosaveBlocked = false; // Custom fork: set while this canvas is being deleted
         void save_to_file(const std::filesystem::path& filePathToSaveAt, bool isAutosave = false);
         void load_from_file(const std::filesystem::path& filePathToLoadFrom, std::string_view buffer);
 
@@ -137,7 +138,6 @@ class World {
 
         // Custom fork: autosave a minute after changes start, and keep trying every minute
         void autosave_update();
-        bool autosaveBlocked = false; // Set while this canvas is being deleted
         std::chrono::steady_clock::time_point lastSaveOrAutosaveAttempt = std::chrono::steady_clock::now();
 
         void load_empty_canvas(const std::optional<std::filesystem::path>& filePathEmptyAutoSaveDir = std::nullopt);
