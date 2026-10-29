@@ -197,6 +197,10 @@ choices stay true to what Levi asked for.
    - **Snip tool (Levi, 2026-10-08):** select part of a PDF page or image on the board and copy it as its own
      object to move, edit or reuse elsewhere. PDF snips stay vector (sharp at any zoom); image snips keep the
      original pixels (crop, no quality loss).
+   - **Lasso snips of text in pictures/PDFs (Levi, 2026-10-29):** the lasso (any shape, not only a rectangle) can cut
+     out part of a PDF page or picture, e.g. one line of a printed math problem, and it becomes its own object that
+     moves, scales, copies/pastes and changes layers exactly like handwriting. PDF snips stay sharp (vector);
+     picture snips keep their original pixels, and simple ones can be made sharp with "trace to vector" (below).
    - Idea to decide later: on import, offer "trace to vector" for simple graphics (diagrams, logos, text) so they
      zoom sharply. Photos can only be AI-upscaled, which adds made-up detail.
      Levi (2026-10-08): he mostly imports PDFs and simple diagram images, so tracing diagrams is the useful case.
